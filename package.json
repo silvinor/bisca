@@ -14,7 +14,12 @@
   "devDependencies": {
     "@preact/preset-vite": "^2.10.6",
     "@types/node": "^24.13.3",
+    "bootstrap": "5.3.8",
+    "sass": "^1.78.0",
     "typescript": "~6.0.2",
     "vite": "^8.3.0"
+  },
+  "allowScripts": {
+    "fsevents@2.3.3": true
   }
 }

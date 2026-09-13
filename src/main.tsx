@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 import { render } from 'preact'
+import '../scss/app.scss'
 import { App } from './app.tsx'
 import { APP_NAME_FALLBACK } from './core/constants.ts'
 import { i18n } from './core/i18n.ts'

@@ -1,0 +1,55 @@
+// Copyright (c) 2026 @SilvinoR
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+/**
+ * App styles
+ * Use this for styles that define (and don't change) in the app.
+ */
+
+@import "../node_modules/bootstrap/scss/functions";
+@import "../node_modules/bootstrap/scss/variables";
+@import "../node_modules/bootstrap/scss/variables-dark";
+@import "../node_modules/bootstrap/scss/maps";
+@import "../node_modules/bootstrap/scss/mixins";
+
+@import "variables";
+
+/* Table surface: fills the viewport; background layers stay inline since they are runtime-configurable */
+.table-surface {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+}
+
+/* Intro screen */
+.intro-card {
+  max-width: 28rem;
+}
+
+.w20 {
+  width: 20%;
+}
+
+/*
+ * Radio toggle buttons, styled as plain tiles (no .btn chrome). The hidden
+ * .toggle-input drives two sibling states on .toggle-option: a persistent
+ * border while checked, and the standard blue form-control halo while it
+ * actually has focus (gone the instant focus moves elsewhere).
+ */
+.toggle-option {
+  display: block;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: var(--bs-border-radius, 0.375rem);
+}
+
+.toggle-input:checked + .toggle-option {
+  border-color: var(--bs-primary);
+}
+
+.toggle-input:focus + .toggle-option {
+  box-shadow: var(--bs-focus-ring-x, 0) var(--bs-focus-ring-y, 0) var(--bs-focus-ring-blur, 0)
+    var(--bs-focus-ring-width) var(--bs-focus-ring-color);
+}
