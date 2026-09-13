@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2026 @SilvinoR
+SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+-->
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loading...</title>
+  <link id="delete-1" rel="shortcut icon" href="favicon.ico">
+  <link id="delete-2" rel="icon" href="favicon.gif">
+  <style id="delete-3">
+    @media (prefers-color-scheme: light) {
+      html, body { background: #fafafa; color: #111; }
+    }
+    @media (prefers-color-scheme: dark) {
+      html, body { background: #1f1f1f; color: #eee; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.tsx"></script>
+  <noscript id="delete-4">This app requires JavaScript</noscript>
+  <script>
+    (function() {
+      const media = window.matchMedia('(prefers-color-scheme: dark)');
+      const setTheme = (dark) => {
+        document.documentElement.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
+      };
+      setTheme(media.matches);
+      media.addEventListener('change', (e) => setTheme(e.matches));
+    })();
+  </script>
+  <script>
+    // Bootstrap Bundle embeds Popper; standalone Bootstrap is injected after its configured Popper dependency.
+    (function enableTooltips() {
+      if (!window.bootstrap?.Tooltip) {
+        window.requestAnimationFrame(enableTooltips);
+        return;
+      }
+
+      new window.bootstrap.Tooltip(document.body, {
+        selector: '[data-bs-toggle="tooltip"]',
+        html: true,
+        // Bootstrap caches data attributes on first hover; read Preact's current title on every show.
+        title: (element) => element.getAttribute('data-bs-title'),
+      });
+    })();
+  </script>
+</body>
+</html>
