@@ -32,6 +32,10 @@
   width: 20%;
 }
 
+.radio-image-unselected {
+  filter: brightness(66.667%);
+}
+
 /*
  * Radio toggle buttons, styled as plain tiles (no .btn chrome). The hidden
  * .toggle-input drives two sibling states on .toggle-option: a persistent

@@ -52,7 +52,13 @@ export function RadioImages<T extends string>({
                 data-bs-toggle='tooltip'
                 data-bs-title={option.label}
               >
-                {option.image ? <img src={option.image} alt={option.label} className='img-fluid rounded' /> : option.label}
+                {option.image ? (
+                  <img
+                    src={option.image}
+                    alt={option.label}
+                    className={`img-fluid rounded rounded-1${option.id === value ? '' : ' radio-image-unselected'}`}
+                  />
+                ) : option.label}
               </label>
             </div>
           );

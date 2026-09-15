@@ -1,13 +1,14 @@
 // Copyright (c) 2026 @SilvinoR
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-import { useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { i18n } from '../core/i18n';
+import { RadioButtons, type RadioButtonOption } from './radio-buttons';
 import { RadioImages } from './radio-images';
 
 export type GameMode = 'bisca-3' | 'bisca-7' | 'bisca-9' | 'bisca-3-players' | 'sueca';
 export type Difficulty = 'easy' | 'normal' | 'hard';
-export type MatchCount = 1 | 3;
+export type MatchCount = 'single-game' | 'one-set' | 'best-of-3' | 'first-to-4';
 
 export interface GameSetupOptions {
   gameMode: GameMode;
@@ -25,137 +26,144 @@ const GAME_MODES: { id: GameMode; image: string; labelKey: string; fallback: str
   { id: 'sueca', image: '/assets/img/menu/mode-5.jpg', labelKey: 'gameMode.sueca', fallback: 'Sueca' },
 ];
 
-const CARD_DECKS: { id: string; labelKey: string; fallback: string }[] = [
-  { id: 'classic', labelKey: 'cardDeck.classic', fallback: 'Classic' },
+interface LocalizedRadioOption<T extends string> {
+  id: T;
+  labelKey: string;
+  fallback: string;
+  variant: RadioButtonOption<T>['variant'];
+}
+
+const DIFFICULTIES: LocalizedRadioOption<Difficulty>[] = [
+  { id: 'easy', labelKey: 'difficulty.easy', fallback: 'Easy', variant: 'success' },
+  { id: 'normal', labelKey: 'difficulty.normal', fallback: 'Normal', variant: 'info' },
+  { id: 'hard', labelKey: 'difficulty.hard', fallback: 'Hard', variant: 'warning' },
 ];
 
-const CARD_BACKS: { id: string; labelKey: string; fallback: string }[] = [
-  { id: 'default', labelKey: 'cardBack.default', fallback: 'Default' },
-];
-
-const DIFFICULTIES: { id: Difficulty; labelKey: string; fallback: string }[] = [
-  { id: 'easy', labelKey: 'difficulty.easy', fallback: 'Easy' },
-  { id: 'normal', labelKey: 'difficulty.normal', fallback: 'Normal' },
-  { id: 'hard', labelKey: 'difficulty.hard', fallback: 'Hard' },
-];
-
-const MATCH_COUNTS: { id: MatchCount; labelKey: string; fallback: string }[] = [
-  { id: 1, labelKey: 'matchCount.single', fallback: 'Single game' },
-  { id: 3, labelKey: 'matchCount.bestOf3', fallback: 'Best of 3' },
+const MATCH_COUNTS: LocalizedRadioOption<MatchCount>[] = [
+  { id: 'single-game', labelKey: 'matchCount.single', fallback: 'Single\nGame', variant: 'secondary' },
+  { id: 'one-set', labelKey: 'matchCount.oneSet', fallback: 'One\nSet', variant: 'secondary' },
+  { id: 'best-of-3', labelKey: 'matchCount.bestOf3', fallback: 'Best of\n Three', variant: 'secondary' },
+  { id: 'first-to-4', labelKey: 'matchCount.firstTo4', fallback: 'First\nto Four', variant: 'secondary' },
 ];
 
 interface IntroScreenProps {
   onStart: (options: GameSetupOptions) => void;
 }
 
-export function IntroScreen({ onStart }: IntroScreenProps) {
-  const [gameMode, setGameMode] = useState<GameMode>('bisca-3');
-  const [cardDeck, setCardDeck] = useState(CARD_DECKS[0].id);
-  const [cardBack, setCardBack] = useState(CARD_BACKS[0].id);
-  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
-  const [matchCount, setMatchCount] = useState<MatchCount>(1);
+interface TooltipInstance {
+  dispose(): void;
+}
 
-  const handleSubmit = (event: Event) => {
-    event.preventDefault();
-    onStart({ gameMode, cardDeck, cardBack, difficulty, matchCount });
+export function IntroScreen({ onStart }: IntroScreenProps) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [gameMode, setGameMode] = useState<GameMode>('bisca-3');
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const [matchCount, setMatchCount] = useState<MatchCount>('single-game');
+
+  useEffect(() => {
+    const Tooltip = (window as Window & {
+      bootstrap?: {
+        Tooltip?: {
+          getOrCreateInstance(element: HTMLElement, options: { container: string }): TooltipInstance;
+        };
+      };
+    }).bootstrap?.Tooltip;
+    if (!Tooltip || !cardRef.current) return;
+
+    const instances = Array.from(cardRef.current.querySelectorAll<HTMLElement>('[data-bs-toggle="tooltip"]'))
+      .map((element) => Tooltip.getOrCreateInstance(element, { container: 'body' }));
+    return () => instances.forEach((instance) => instance.dispose());
+  }, []);
+
+  const handleStart = () => {
+    onStart({ gameMode, cardDeck: 'silvinor', cardBack: 'a', difficulty, matchCount });
   };
 
   return (
-    <div className='card shadow mx-auto intro-card'>
+    <div ref={cardRef} className='card shadow mx-auto intro-card rounded-4'>
+      <div className='card-header'>
+        <h1 className='h2 card-title text-center mb-0'>{i18n.t('appName', 'Bisca')}</h1>
+      </div>
       <div className='card-body'>
-        <h1 className='card-title text-center mb-4'>{i18n.t('appName', 'Bisca')}</h1>
-        <form onSubmit={handleSubmit}>
-          <div className='mb-3'>
-            <span className='form-label d-block'>{i18n.t('intro.gameMode', 'Game mode')}</span>
-            <RadioImages
-              name='game-mode'
-              value={gameMode}
-              onChange={setGameMode}
-              ariaLabel={i18n.t('intro.gameMode', 'Game mode')}
-              options={GAME_MODES.map((mode) => ({
-                id: mode.id,
-                image: mode.image,
-                label: i18n.t(mode.labelKey, mode.fallback),
-              }))}
-            />
-          </div>
+        <div className='mb-3'>
+          <span className='form-label d-block'>{i18n.t('intro.gameMode', 'Game mode')}</span>
+          <RadioImages
+            name='game-mode'
+            value={gameMode}
+            onChange={setGameMode}
+            ariaLabel={i18n.t('intro.gameMode', 'Game mode')}
+            options={GAME_MODES.map((mode) => ({
+              id: mode.id,
+              image: mode.image,
+              label: i18n.t(mode.labelKey, mode.fallback),
+            }))}
+          />
+        </div>
 
-          <div className='mb-3'>
-            <label className='form-label' htmlFor='card-deck'>
-              {i18n.t('intro.cardDeck', 'Card deck')}
-            </label>
-            <select
-              id='card-deck'
-              className='form-select'
-              value={cardDeck}
-              onChange={(e) => setCardDeck(e.currentTarget.value)}
-            >
-              {CARD_DECKS.map((deck) => (
-                <option key={deck.id} value={deck.id}>
-                  {i18n.t(deck.labelKey, deck.fallback)}
-                </option>
-              ))}
-            </select>
-          </div>
+        <fieldset className='mb-3'>
+          <legend className='form-label fs-6'>
+            {i18n.t('intro.difficulty', 'Difficulty')}
+          </legend>
+          <RadioButtons
+            name='difficulty'
+            value={difficulty}
+            onChange={setDifficulty}
+            ariaLabel={i18n.t('intro.difficulty', 'Difficulty')}
+            options={DIFFICULTIES.map((option) => ({
+              id: option.id,
+              label: i18n.t(option.labelKey, option.fallback),
+              variant: option.variant,
+            }))}
+          />
+        </fieldset>
 
-          {/* <div className='mb-3'>
-            <label className='form-label' htmlFor='card-back'>
-              {i18n.t('intro.cardBack', 'Card back')}
-            </label>
-            <select
-              id='card-back'
-              className='form-select'
-              value={cardBack}
-              onChange={(e) => setCardBack(e.currentTarget.value)}
-            >
-              {CARD_BACKS.map((back) => (
-                <option key={back.id} value={back.id}>
-                  {i18n.t(back.labelKey, back.fallback)}
-                </option>
-              ))}
-            </select>
-          </div>
+        <fieldset>
+          <legend className='form-label fs-6'>
+            {i18n.t('intro.matchCount', 'Match count')}
+          </legend>
+          <RadioButtons
+            name='match-count'
+            value={matchCount}
+            onChange={setMatchCount}
+            ariaLabel={i18n.t('intro.matchCount', 'Match count')}
+            options={MATCH_COUNTS.map((option) => ({
+              id: option.id,
+              label: i18n.t(option.labelKey, option.fallback),
+              variant: option.variant,
+            }))}
+          />
+        </fieldset>
 
-          <div className='mb-3'>
-            <label className='form-label' htmlFor='difficulty'>
-              {i18n.t('intro.difficulty', 'Difficulty')}
-            </label>
-            <select
-              id='difficulty'
-              className='form-select'
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.currentTarget.value as Difficulty)}
-            >
-              {DIFFICULTIES.map((level) => (
-                <option key={level.id} value={level.id}>
-                  {i18n.t(level.labelKey, level.fallback)}
-                </option>
-              ))}
-            </select>
-          </div>
+      </div> 
+      <div className='card-footer py-4'>
 
-          <div className='mb-4'>
-            <label className='form-label' htmlFor='match-count'>
-              {i18n.t('intro.matchCount', 'Match count')}
-            </label>
-            <select
-              id='match-count'
-              className='form-select'
-              value={matchCount}
-              onChange={(e) => setMatchCount(Number(e.currentTarget.value) as MatchCount)}
-            >
-              {MATCH_COUNTS.map((count) => (
-                <option key={count.id} value={count.id}>
-                  {i18n.t(count.labelKey, count.fallback)}
-                </option>
-              ))}
-            </select>
-          </div> */}
-
-          <button type='submit' className='btn btn-primary w-100'>
+        <div className='d-flex justify-content-center align-items-center gap-2'>
+          <button type='button' className='btn btn-success flex-grow-1' onClick={handleStart}>
+            <i className='fa-solid fa-circle-play me-2' aria-hidden='true' />
             {i18n.t('intro.start', 'Start game')}
           </button>
-        </form>
+          <button
+            type='button'
+            className='btn btn-primary'
+            aria-label={i18n.t('intro.settings', 'Settings')}
+            data-bs-toggle='tooltip'
+            data-bs-placement='top'
+            data-bs-title={i18n.t('intro.settings', 'Settings')}
+          >
+            <i className='fa-solid fa-gear' aria-hidden='true' />
+          </button>
+          <button
+            type='button'
+            className='btn btn-info'
+            aria-label={i18n.t('intro.help', 'Help')}
+            data-bs-toggle='tooltip'
+            data-bs-placement='top'
+            data-bs-title={i18n.t('intro.help', 'Help')}
+          >
+            <i className='fa-solid fa-question' aria-hidden='true' />
+          </button>
+        </div>
+
       </div>
     </div>
   );
