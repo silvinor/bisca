@@ -2,41 +2,46 @@
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 import type { ComponentChildren } from 'preact';
-
-const DEFAULT_TABLE_COLOR = '#096';
-const DEFAULT_TABLE_TEXTURE = '/assets/img/table/felt.png';
-const DEFAULT_TABLE_SPOTLIGHT = '/assets/img/table/_spotlight.png';
+import { useLayoutEffect, useRef } from 'preact/hooks';
+import { PLAYING_SURFACE_ASPECT_RATIO } from '../core/constants';
 
 interface TableProps {
-  color?: string;
-  texture?: string;
-  spotlight?: string;
   children?: ComponentChildren;
 }
 
-export function Table({
-  color = DEFAULT_TABLE_COLOR,
-  texture = DEFAULT_TABLE_TEXTURE,
-  spotlight = DEFAULT_TABLE_SPOTLIGHT,
-  children,
-}: TableProps) {
-  // Layers are stacked top to bottom: spotlight over texture over the base color.
-  const layers = [
-    spotlight && { image: spotlight, size: '100% 100%', repeat: 'no-repeat' },
-    texture && { image: texture, size: 'auto', repeat: 'repeat' },
-  ].filter((layer): layer is { image: string; size: string; repeat: string } => Boolean(layer));
+export function Table({ children }: TableProps) {
+  const surfaceRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const surface = surfaceRef.current;
+    const host = surface?.parentElement;
+    if (!surface || !host) return;
+
+    const resizeSurface = () => {
+      const availableWidth = host.clientWidth;
+      const availableHeight = host.clientHeight;
+      if (availableWidth === 0 || availableHeight === 0) return;
+
+      const fitToHeight = availableWidth / availableHeight > PLAYING_SURFACE_ASPECT_RATIO;
+      const width = fitToHeight
+        ? availableHeight * PLAYING_SURFACE_ASPECT_RATIO
+        : availableWidth;
+      const height = fitToHeight
+        ? availableHeight
+        : availableWidth / PLAYING_SURFACE_ASPECT_RATIO;
+
+      surface.style.width = `${width}px`;
+      surface.style.height = `${height}px`;
+    };
+
+    const resizeObserver = new ResizeObserver(resizeSurface);
+    resizeObserver.observe(host);
+    resizeSurface();
+
+    return () => resizeObserver.disconnect();
+  }, []);
 
   return (
-    <div
-      className='table-surface'
-      style={{
-        backgroundColor: color,
-        backgroundImage: layers.map((layer) => `url(${layer.image})`).join(', ') || undefined,
-        backgroundSize: layers.map((layer) => layer.size).join(', '),
-        backgroundRepeat: layers.map((layer) => layer.repeat).join(', '),
-      }}
-    >
-      <div className='container'>{children}</div>
-    </div>
+    <div ref={surfaceRef} className='surface'>{children}</div>
   );
 }

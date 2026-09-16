@@ -54,6 +54,7 @@ interface HelpScreenProps {
 
 export function HelpScreen({ open, onClose }: HelpScreenProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
   const [helpHtml, setHelpHtml] = useState<string | null>(null);
@@ -89,7 +90,17 @@ export function HelpScreen({ open, onClose }: HelpScreenProps) {
   useEffect(() => {
     const element = modalRef.current;
     if (!element) return;
-    const handleHide = () => onCloseRef.current();
+    const handleHide = () => {
+      const activeElement = document.activeElement;
+      if (activeElement instanceof HTMLElement && element.contains(activeElement)) {
+        const returnTarget = returnFocusRef.current;
+        queueMicrotask(() => {
+          if (returnTarget?.isConnected) returnTarget.focus();
+          if (element.contains(document.activeElement)) activeElement.blur();
+        });
+      }
+      onCloseRef.current();
+    };
     element.addEventListener('hide.bs.modal', handleHide);
     return () => {
       element.removeEventListener('hide.bs.modal', handleHide);
@@ -102,7 +113,15 @@ export function HelpScreen({ open, onClose }: HelpScreenProps) {
     const Modal = getBootstrapModal();
     if (!element || !Modal) return;
     const instance = Modal.getOrCreateInstance(element);
-    if (open) instance.show();
+    if (open) {
+      const activeElement = document.activeElement;
+      returnFocusRef.current = activeElement instanceof HTMLElement
+        && activeElement !== document.body
+        && !element.contains(activeElement)
+        ? activeElement
+        : null;
+      instance.show();
+    }
     else instance.hide();
   }, [open]);
 

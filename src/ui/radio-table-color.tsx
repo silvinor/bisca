@@ -3,21 +3,22 @@
 
 import { useState } from 'preact/hooks';
 
-export interface RadioImagesOption<T extends string> {
+export interface RadioTableOption<T extends string> {
   id: T;
   label: string;
-  description?: string;
-  image?: string;
+  description: string;
+  preview: string;
 }
 
-interface RadioImagesProps<T extends string> {
+interface RadioTableColorProps<T extends string> {
   name: string;
-  options: RadioImagesOption<T>[];
+  mode: 'color' | 'texture';
+  options: RadioTableOption<T>[];
   value: T;
   onChange: (value: T) => void;
-  ariaLabel?: string;
-  tableColor: string;
-  tableTexture: string;
+  ariaLabel: string;
+  backgroundColor?: string;
+  backgroundTexture?: string;
 }
 
 function safeHtmlIdPart(value: string): string {
@@ -28,21 +29,16 @@ function safeHtmlIdPart(value: string): string {
   ).join('');
 }
 
-/**
- * A single-choice radio group, styled as plain bordered tiles rather than
- * Bootstrap's `.btn`/`.btn-check` buttons. Each option gets its own `.w20`
- * wrapper (the flex item) so percentage sizing is resolved against a definite
- * width instead of the image's own intrinsic size.
- */
-export function RadioImages<T extends string>({
+export function RadioTableColor<T extends string>({
   name,
+  mode,
   options,
   value,
   onChange,
   ariaLabel,
-  tableColor,
-  tableTexture,
-}: RadioImagesProps<T>) {
+  backgroundColor = 'transparent',
+  backgroundTexture,
+}: RadioTableColorProps<T>) {
   const selectedOption = options.find((option) => option.id === value);
   const [focusedOptionId, setFocusedOptionId] = useState<T | null>(null);
 
@@ -50,10 +46,11 @@ export function RadioImages<T extends string>({
     <div>
       <div className='d-flex flex-wrap' role='group' aria-label={ariaLabel}>
         {options.map((option) => {
-          const inputId = `radio-${safeHtmlIdPart(name)}-${safeHtmlIdPart(option.id)}`;
           const isSelected = option.id === value;
           const isFocused = option.id === focusedOptionId;
-
+          const inputId = `radio-${safeHtmlIdPart(name)}-${safeHtmlIdPart(option.id)}`;
+          const color = mode === 'color' ? option.preview : backgroundColor;
+          const texture = mode === 'texture' ? option.preview : backgroundTexture;
           return (
             <div key={option.id} className='w20 p-1'>
               <input
@@ -73,39 +70,39 @@ export function RadioImages<T extends string>({
                 data-bs-toggle='tooltip'
                 data-bs-title={option.label}
               >
-                {option.image ? (
-                  <div
-                    className={`radio-image-preview rounded rounded-1 ${isSelected ? 'selected' : 'unselected'} ${isFocused ? 'focused' : 'unfocused'}`}
+                <div
+                  className={`radio-image-preview radio-table-color-preview rounded rounded-1 ${isSelected ? 'selected' : 'unselected'} ${isFocused ? 'focused' : 'unfocused'}`}
+                >
+                  <svg
+                    className='radio-image-preview-color'
+                    width='512'
+                    height='256'
+                    viewBox='0 0 512 256'
+                    aria-hidden='true'
                   >
-                    <svg
-                      className='radio-image-preview-color'
-                      width='512'
-                      height='512'
-                      viewBox='0 0 512 512'
-                      aria-hidden='true'
-                    >
-                      <rect width='512' height='512' fill={tableColor} />
-                    </svg>
+                    <rect width='512' height='256' fill={color} />
+                  </svg>
+                  {texture && (
                     <span
                       className='radio-image-preview-texture'
-                      style={{ backgroundImage: `url(${tableTexture})` }}
+                      style={{ backgroundImage: `url(${texture})` }}
                       aria-hidden='true'
                     />
-                    <img
-                      src={option.image}
-                      alt={option.label}
-                      className='radio-image-preview-art'
-                    />
-                    <span className='radio-image-overlay visually-hidden'>{option.label}</span>
-                  </div>
-                ) : option.label}
+                  )}
+                  <span
+                    className='radio-image-preview-art'
+                    aria-hidden='true'
+                  />
+                  <span className='radio-image-overlay visually-hidden'>{option.label}
+                  </span>
+                </div>
               </label>
             </div>
           );
         })}
       </div>
       <div className='form-text text-info' aria-live='polite'>
-        {selectedOption?.description ?? selectedOption?.label}
+        {selectedOption?.description}
       </div>
     </div>
   );

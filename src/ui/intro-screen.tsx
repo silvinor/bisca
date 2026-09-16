@@ -4,7 +4,6 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import {
   Difficulty,
-  DEFAULT_CARD_BACK,
   GameMode,
   MatchCount,
   PERSISTENCE_SECTION_STARTUP,
@@ -23,11 +22,11 @@ export interface GameSetupOptions {
 }
 
 const GAME_MODES: { id: GameMode; image: string; labelKey: string; fallback: string }[] = [
-  { id: GameMode.MODE1, image: '/assets/img/menu/mode-1.jpg', labelKey: 'gameMode.mode1', fallback: 'Bisca dos Três' },
-  { id: GameMode.MODE2, image: '/assets/img/menu/mode-2.jpg', labelKey: 'gameMode.mode2', fallback: 'Bisca dos Sete' },
-  { id: GameMode.MODE3, image: '/assets/img/menu/mode-3.jpg', labelKey: 'gameMode.mode3', fallback: 'Bisca dos Nove' },
-  { id: GameMode.MODE4, image: '/assets/img/menu/mode-4.jpg', labelKey: 'gameMode.mode4', fallback: 'Bisca dos Três (3 Players)' },
-  { id: GameMode.MODE5, image: '/assets/img/menu/mode-5.jpg', labelKey: 'gameMode.mode5', fallback: 'Sueca' },
+  { id: GameMode.MODE1, image: '/assets/img/menu/mode-1.png', labelKey: 'gameMode.mode1', fallback: 'Bisca dos Três' },
+  { id: GameMode.MODE2, image: '/assets/img/menu/mode-2.png', labelKey: 'gameMode.mode2', fallback: 'Bisca dos Sete' },
+  { id: GameMode.MODE3, image: '/assets/img/menu/mode-3.png', labelKey: 'gameMode.mode3', fallback: 'Bisca dos Nove' },
+  { id: GameMode.MODE4, image: '/assets/img/menu/mode-4.png', labelKey: 'gameMode.mode4', fallback: 'Bisca dos Três (3 Players)' },
+  { id: GameMode.MODE5, image: '/assets/img/menu/mode-5.png', labelKey: 'gameMode.mode5', fallback: 'Sueca' },
 ];
 
 interface LocalizedRadioOption<T extends string> {
@@ -71,6 +70,9 @@ interface IntroScreenProps {
   onSettings: () => void;
   onHelp: () => void;
   cardDeck: string;
+  cardBack: string;
+  tableColor: string;
+  tableTexture: string;
   shortcutsEnabled: boolean;
 }
 
@@ -88,8 +90,18 @@ function getBootstrapTooltip(): TooltipPlugin | undefined {
   return (window as Window & { bootstrap?: { Tooltip?: TooltipPlugin } }).bootstrap?.Tooltip;
 }
 
-export function IntroScreen({ onStart, onSettings, onHelp, cardDeck, shortcutsEnabled }: IntroScreenProps) {
+export function IntroScreen({
+  onStart,
+  onSettings,
+  onHelp,
+  cardDeck,
+  cardBack,
+  tableColor,
+  tableTexture,
+  shortcutsEnabled,
+}: IntroScreenProps) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const startButtonRef = useRef<HTMLButtonElement>(null);
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const helpButtonRef = useRef<HTMLButtonElement>(null);
   const [selections, setSelections] = useState<StartupSelections>(() =>
@@ -116,6 +128,12 @@ export function IntroScreen({ onStart, onSettings, onHelp, cardDeck, shortcutsEn
 
       let change: Partial<StartupSelections> | undefined;
       switch (event.key.toLowerCase()) {
+        case 'enter':
+        case 'return':
+          if (target instanceof HTMLElement && target.closest('button')) return;
+          event.preventDefault();
+          startButtonRef.current?.click();
+          return;
         case '.':
           event.preventDefault();
           settingsButtonRef.current?.click();
@@ -152,7 +170,7 @@ export function IntroScreen({ onStart, onSettings, onHelp, cardDeck, shortcutsEn
   }, []);
 
   const handleStart = () => {
-    onStart({ ...selectionsRef.current, cardDeck, cardBack: DEFAULT_CARD_BACK });
+    onStart({ ...selectionsRef.current, cardDeck, cardBack });
   };
 
   const handleSettings = (button: HTMLButtonElement) => {
@@ -178,6 +196,8 @@ export function IntroScreen({ onStart, onSettings, onHelp, cardDeck, shortcutsEn
             value={gameMode}
             onChange={(value) => updateSelections({ gameMode: value })}
             ariaLabel={i18n.t('intro.gameMode', 'Game mode')}
+            tableColor={tableColor}
+            tableTexture={tableTexture}
             options={GAME_MODES.map((mode) => ({
               id: mode.id,
               image: mode.image,
@@ -224,7 +244,12 @@ export function IntroScreen({ onStart, onSettings, onHelp, cardDeck, shortcutsEn
       <div className='card-footer py-4'>
 
         <div className='d-flex justify-content-center align-items-center gap-2'>
-          <button type='button' className='btn btn-success flex-grow-1' onClick={handleStart}>
+          <button
+            ref={startButtonRef}
+            type='button'
+            className='btn btn-success flex-grow-1'
+            onClick={handleStart}
+          >
             <i className='fa-solid fa-circle-play me-2' aria-hidden='true' />
             {i18n.t('intro.start', 'Start game')}
           </button>

@@ -4,6 +4,7 @@
 import {
   PERSISTENCE_STORAGE_PREFIX,
   PERSISTENCE_STORAGE_VERSION,
+  type LegacyPersistedSection,
   type PersistedSection,
 } from './constants';
 
@@ -16,7 +17,7 @@ export class PersistanceEngine {
     }
   }
 
-  private key(section: PersistedSection): string {
+  private key(section: string): string {
     return `${PERSISTENCE_STORAGE_PREFIX}.${section}`;
   }
 
@@ -32,6 +33,14 @@ export class PersistanceEngine {
   }
 
   load<T>(section: PersistedSection, isValid: (value: unknown) => value is T): T | null {
+    return this.loadSection(section, isValid);
+  }
+
+  loadLegacy<T>(section: LegacyPersistedSection, isValid: (value: unknown) => value is T): T | null {
+    return this.loadSection(section, isValid);
+  }
+
+  private loadSection<T>(section: string, isValid: (value: unknown) => value is T): T | null {
     try {
       const stored = this.getStorage()?.getItem(this.key(section));
       if (!stored) return null;
@@ -48,6 +57,15 @@ export class PersistanceEngine {
   clear(section: PersistedSection): void {
     try {
       this.getStorage()?.removeItem(this.key(section));
+    } catch {
+      // Storage can be unavailable or blocked; gameplay must still work.
+    }
+  }
+
+  clearLegacy(sections: readonly LegacyPersistedSection[]): void {
+    try {
+      const storage = this.getStorage();
+      sections.forEach((section) => storage?.removeItem(this.key(section)));
     } catch {
       // Storage can be unavailable or blocked; gameplay must still work.
     }

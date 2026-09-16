@@ -6,6 +6,14 @@
 
 /* General */
 export const APP_NAME_FALLBACK = "Bisca"; // Name of App if not in language file
+export const PLAYING_SURFACE_ASPECT_RATIO = 3 / 2;
+export const WELCOME_AMBIGRAM_PATH = '/assets/img/ambigram.svg';
+export const WELCOME_ANIMATION_DURATION_MS = 3_000;
+export const WELCOME_ANIMATION_START_SIZE_PERCENT = 20;
+export const WELCOME_ANIMATION_END_SIZE_PERCENT = 80;
+export const WELCOME_ANIMATION_START_ROTATION_DEGREES = -90;
+export const WELCOME_ANIMATION_ROTATION_DEGREES = 270;
+export const WELCOME_COMPLETION_DELAY_MS = 1_000;
 
 /* File handling */
 export const APP_LANGUAGE_PATH = "/lang";
@@ -32,21 +40,86 @@ export enum MatchCount {
   FOUR = 'four', // First to 4 sets
 }
 
+export enum TableColor {
+  GREEN = 'green',
+  RED = 'red',
+  BLUE = 'blue',
+  BLACK = 'black',
+  PURPLE = 'purple',
+}
+
+export const TABLE_COLOR_HEX: Record<TableColor, string> = {
+  [TableColor.GREEN]: '#096',
+  [TableColor.RED]: '#C50',
+  [TableColor.BLUE]: '#069',
+  [TableColor.BLACK]: '#555',
+  [TableColor.PURPLE]: '#A7C',
+};
+
+export enum TableTexture {
+  FELT = 'felt',
+  LEATHER = 'leather',
+  SUEDE = 'suede',
+  FABRIC = 'fabric',
+  DIGITAL = 'digital',
+}
+
+export enum GameScreen {
+  WELCOME = 'welcome',
+  INTRO = 'intro',
+  HELP = 'help',
+  SETTINGS = 'settings',
+  PLAYING = 'playing',
+  YOU_WIN = 'you-win',
+  YOU_LOSE = 'you-lose',
+}
+
+export enum GameStateAction {
+  WELCOME_COMPLETE = 'welcome-complete',
+  OPEN_HELP = 'open-help',
+  CLOSE_HELP = 'close-help',
+  OPEN_SETTINGS = 'open-settings',
+  CLOSE_SETTINGS = 'close-settings',
+  START_GAME = 'start-game',
+  GAME_WON = 'game-won',
+  GAME_LOST = 'game-lost',
+  CONTINUE = 'continue',
+}
+
+export const TABLE_TEXTURE_PATH: Record<TableTexture, string> = {
+  [TableTexture.FELT]: '/assets/img/table/felt.png',
+  [TableTexture.LEATHER]: '/assets/img/table/leather.png',
+  [TableTexture.SUEDE]: '/assets/img/table/suede.png',
+  [TableTexture.FABRIC]: '/assets/img/table/fabric.png',
+  [TableTexture.DIGITAL]: '/assets/img/table/digital.png',
+};
+
+export const TABLE_SPOTLIGHT_PATH = '/assets/img/table/_spotlight.png';
+
 /* Local storage */
 export const PERSISTENCE_SECTION_STARTUP = 'startup';
-export const PERSISTENCE_SECTION_GAME_STATE = 'game-state';
-export const PERSISTENCE_SECTION_SETTINGS_SCREEN = 'settings-screen';
-export const PERSISTENCE_SECTION_HELP_SCREEN = 'help-screen';
-export const PERSISTENCE_SECTION_GAME_DECK = 'game-deck';
+export const PERSISTENCE_SECTION_GAME_STATE = 'game';
+export const PERSISTENCE_SECTION_SETTINGS = 'settings';
 export const PERSISTENCE_STORAGE_VERSION = 1;
 export const PERSISTENCE_STORAGE_PREFIX = 'bisca';
 
-export const DEFAULT_GAME_DECK = 'silvinor';
+export const LEGACY_PERSISTENCE_SECTIONS = [
+  'settings-screen',
+  'game-deck',
+  'card-back',
+  'card-backs',
+  'help-screen',
+] as const;
+
+export const DEFAULT_GAME_DECK = 'default';
 export const DEFAULT_CARD_BACK = 'a';
+export const DEFAULT_TABLE_COLOR = TableColor.GREEN;
+export const DEFAULT_TABLE_TEXTURE = TableTexture.FELT;
+export const MAX_CARD_BACKS = 26;
 
 export type PersistedSection =
   | typeof PERSISTENCE_SECTION_STARTUP
   | typeof PERSISTENCE_SECTION_GAME_STATE
-  | typeof PERSISTENCE_SECTION_SETTINGS_SCREEN
-  | typeof PERSISTENCE_SECTION_HELP_SCREEN
-  | typeof PERSISTENCE_SECTION_GAME_DECK;
+  | typeof PERSISTENCE_SECTION_SETTINGS;
+
+export type LegacyPersistedSection = typeof LEGACY_PERSISTENCE_SECTIONS[number];

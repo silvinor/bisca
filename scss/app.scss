@@ -13,8 +13,8 @@
 
 @import "variables";
 
-/* Table surface: fills the viewport; background layers stay inline since they are runtime-configurable */
-.table-surface {
+/* The Preact host owns the runtime-configurable table background. */
+#app {
   position: fixed;
   inset: 0;
   display: flex;
@@ -23,8 +23,63 @@
   overflow: auto;
 }
 
+.surface {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  aspect-ratio: 3 / 2;
+}
+
+.screen-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  overflow: auto;
+  padding: $spacer;
+
+  & > * {
+    margin: auto;
+  }
+}
+
+.welcome-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  cursor: none;
+}
+
+.welcome-ambigram {
+  display: block;
+  width: var(--welcome-animation-start-size);
+  height: auto;
+  animation: welcome-ambigram-reveal var(--welcome-animation-duration) ease-in-out forwards;
+  filter: drop-shadow(0 1.25rem 1rem rgba($black, .65));
+}
+
+@keyframes welcome-ambigram-reveal {
+  from {
+    width: var(--welcome-animation-start-size);
+    transform: rotate(var(--welcome-animation-start-rotation));
+  }
+
+  to {
+    width: var(--welcome-animation-end-size);
+    transform: rotate(calc(
+      var(--welcome-animation-start-rotation) + var(--welcome-animation-rotation)
+    ));
+  }
+}
+
 /* Intro screen */
 .intro-card {
+  width: 100%;
   max-width: 28rem;
 }
 
@@ -45,17 +100,91 @@
   }
 }
 
-.radio-image-selected {
-  // outline: 0;
-  @if $enable-shadows {
-    @include box-shadow($focus-ring-box-shadow);
-  } @else {
-    box-shadow: $focus-ring-box-shadow;
+// ----- Used in src/ui/radio-images.tsx -----
+
+.radio-image-preview {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1;
+
+  &.selected {
+    @if $enable-shadows {
+      @include box-shadow($focus-ring-box-shadow);
+    } @else {
+      box-shadow: $focus-ring-box-shadow;
+    }
+  }
+
+  &.unselected {
+    & > .radio-image-preview-art {
+      opacity: .75;
+    }
+
+    & > .radio-image-preview-color,
+    & > .radio-image-preview-texture {
+      background-color: rgba(0,0,0,.25);
+      // opacity: .5;
+    }
+  }
+
+  &.focused {
+    & > .radio-image-preview-art {
+      background-color: rgba(255,255,255,.25);
+    }
+  }
+
+  & > .radio-image-preview-color,
+  & > .radio-image-preview-texture,
+  & > .radio-image-preview-art {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  & > .radio-image-preview-texture {
+    background-repeat: repeat;
+  }
+
+  & > .radio-image-preview-art {
+    object-fit: contain;
+  }
+
+  & > .radio-image-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+}
+
+// ----- Used in src/ui/radio-card-backs.tsx -----
+// ..... reuses from above .....
+
+.radio-image-preview {
+  & > .radio-image-card-back-art {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    width: auto;
+    height: 72%; // 480px within the 512px square source image
+    transform: translate(-50%, -50%);
+  }
+
+  &.unselected > .radio-image-card-back-art {
+    opacity: .75;
   }
 }
 
-.radio-image-unselected {
-  filter: brightness(66.667%);
+// -----
+
+.radio-table-color-preview {
+  aspect-ratio: 2 / 1;
 }
 
 /*
