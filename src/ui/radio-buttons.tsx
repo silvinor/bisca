@@ -3,7 +3,7 @@
 
 import { Fragment } from 'preact';
 
-type ButtonVariant = 'success' | 'primary' | 'warning' | 'secondary';
+type ButtonVariant = 'success' | 'primary' | 'info' | 'warning' | 'secondary';
 
 export interface RadioButtonOption<T extends string> {
   id: T;

@@ -4,6 +4,7 @@
 export interface RadioImagesOption<T extends string> {
   id: T;
   label: string;
+  description?: string;
   image?: string;
 }
 
@@ -13,6 +14,14 @@ interface RadioImagesProps<T extends string> {
   value: T;
   onChange: (value: T) => void;
   ariaLabel?: string;
+}
+
+function safeHtmlIdPart(value: string): string {
+  return Array.from(value, (character) =>
+    /^[a-z0-9-]$/i.test(character)
+      ? character
+      : `_u${character.codePointAt(0)!.toString(16)}_`,
+  ).join('');
 }
 
 /**
@@ -34,7 +43,7 @@ export function RadioImages<T extends string>({
     <div>
       <div className='d-flex flex-wrap' role='group' aria-label={ariaLabel}>
         {options.map((option) => {
-          const inputId = `${name}-${option.id}`;
+          const inputId = `radio-${safeHtmlIdPart(name)}-${safeHtmlIdPart(option.id)}`;
           return (
             <div key={option.id} className='w20 p-1'>
               <input
@@ -56,7 +65,7 @@ export function RadioImages<T extends string>({
                   <img
                     src={option.image}
                     alt={option.label}
-                    className={`img-fluid rounded rounded-1${option.id === value ? '' : ' radio-image-unselected'}`}
+                    className={`img-fluid rounded rounded-1 ${option.id === value ? 'radio-image-selected' : 'radio-image-unselected'}`}
                   />
                 ) : option.label}
               </label>
@@ -65,7 +74,7 @@ export function RadioImages<T extends string>({
         })}
       </div>
       <div className='form-text text-info' aria-live='polite'>
-        {selectedOption?.label}
+        {selectedOption?.description ?? selectedOption?.label}
       </div>
     </div>
   );

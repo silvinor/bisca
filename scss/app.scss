@@ -28,8 +28,30 @@
   max-width: 28rem;
 }
 
+.settings-modal-body,
+.help-modal-body {
+  min-height: min(60vh, 36rem);
+}
+
 .w20 {
   width: 20%;
+
+  @include media-breakpoint-between(sm, lg) {
+    width: 25%;
+  }
+
+  @include media-breakpoint-down(sm) {
+    width: 33.333333%;
+  }
+}
+
+.radio-image-selected {
+  // outline: 0;
+  @if $enable-shadows {
+    @include box-shadow($focus-ring-box-shadow);
+  } @else {
+    box-shadow: $focus-ring-box-shadow;
+  }
 }
 
 .radio-image-unselected {
