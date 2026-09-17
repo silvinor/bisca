@@ -22,10 +22,10 @@ export interface GameSetupOptions {
 }
 
 const GAME_MODES: { id: GameMode; image: string; labelKey: string; fallback: string }[] = [
-  { id: GameMode.MODE1, image: '/assets/img/menu/mode-1.png', labelKey: 'gameMode.mode1', fallback: 'Bisca dos Três' },
-  { id: GameMode.MODE2, image: '/assets/img/menu/mode-2.png', labelKey: 'gameMode.mode2', fallback: 'Bisca dos Sete' },
-  { id: GameMode.MODE3, image: '/assets/img/menu/mode-3.png', labelKey: 'gameMode.mode3', fallback: 'Bisca dos Nove' },
-  { id: GameMode.MODE4, image: '/assets/img/menu/mode-4.png', labelKey: 'gameMode.mode4', fallback: 'Bisca dos Três (3 Players)' },
+  { id: GameMode.MODE1, image: '/assets/img/menu/mode-1.png', labelKey: 'gameMode.mode1', fallback: 'Threes Bisca' },
+  { id: GameMode.MODE2, image: '/assets/img/menu/mode-2.png', labelKey: 'gameMode.mode2', fallback: 'Sevens Bisca' },
+  { id: GameMode.MODE3, image: '/assets/img/menu/mode-3.png', labelKey: 'gameMode.mode3', fallback: 'Nines Bisca' },
+  { id: GameMode.MODE4, image: '/assets/img/menu/mode-4.png', labelKey: 'gameMode.mode4', fallback: '3 Player Bisca' },
   { id: GameMode.MODE5, image: '/assets/img/menu/mode-5.png', labelKey: 'gameMode.mode5', fallback: 'Sueca' },
 ];
 

@@ -1,13 +1,17 @@
 // Copyright (c) 2026 @SilvinoR
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
+import type { ComponentChildren } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import {
+  CourtCardPoints,
   DEFAULT_CARD_BACK,
+  ScoreKeeping,
   TABLE_COLOR_HEX,
   TABLE_TEXTURE_PATH,
   TableColor,
   TableTexture,
+  TenCard,
 } from '../core/constants';
 import { deckBackUrl, deckPreviewUrl, loadDeckCatalog, type DeckCatalogEntry } from '../core/deck-catalog';
 import { i18n } from '../core/i18n';
@@ -118,6 +122,12 @@ interface SettingsScreenProps {
   onTableColorChange: (tableColor: TableColor) => void;
   selectedTableTexture: TableTexture;
   onTableTextureChange: (tableTexture: TableTexture) => void;
+  selectedTenCard: TenCard;
+  onTenCardChange: (tenCard: TenCard) => void;
+  selectedCourtCardPoints: CourtCardPoints;
+  onCourtCardPointsChange: (courtCardPoints: CourtCardPoints) => void;
+  selectedScoreKeeping: ScoreKeeping;
+  onScoreKeepingChange: (scoreKeeping: ScoreKeeping) => void;
 }
 
 interface TooltipInstance {
@@ -127,6 +137,46 @@ interface TooltipInstance {
 function cardBackIds(count: number): string[] {
   const firstBackCode = 'a'.charCodeAt(0);
   return Array.from({ length: count }, (_, index) => String.fromCharCode(firstBackCode + index));
+}
+
+function niceCheckLabel(label: string): ComponentChildren {
+  const firstPeriod = label.indexOf('.');
+  const firstParenthesis = label.indexOf('(');
+  const boldEnd = Math.min(
+    firstPeriod === -1 ? label.length : firstPeriod,
+    firstParenthesis === -1 ? label.length : firstParenthesis,
+  );
+  const parts: ComponentChildren[] = [];
+  const parenthesizedText = /\([^)]*\)/g;
+  let cursor = 0;
+
+  const addPlainText = (end: number) => {
+    if (cursor < boldEnd) {
+      const endOfBoldText = Math.min(end, boldEnd);
+      parts.push(
+        <span className='text-primary' key={`bold-${cursor}`}>
+          {label.slice(cursor, endOfBoldText)}
+        </span>,
+      );
+      cursor = endOfBoldText;
+    }
+    if (cursor < end) parts.push(label.slice(cursor, end));
+    cursor = end;
+  };
+
+  for (const match of label.matchAll(parenthesizedText)) {
+    const matchStart = match.index;
+    addPlainText(matchStart);
+    parts.push(
+      <span className='text-body-tertiary' key={`muted-${matchStart}`}>
+        {match[0]}
+      </span>,
+    );
+    cursor = matchStart + match[0].length;
+  }
+  addPlainText(label.length);
+
+  return parts;
 }
 
 export function SettingsScreen({
@@ -140,6 +190,12 @@ export function SettingsScreen({
   onTableColorChange,
   selectedTableTexture,
   onTableTextureChange,
+  selectedTenCard,
+  onTenCardChange,
+  selectedCourtCardPoints,
+  onCourtCardPointsChange,
+  selectedScoreKeeping,
+  onScoreKeepingChange,
 }: SettingsScreenProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const settingsOptionsRef = useRef<HTMLDivElement>(null);
@@ -336,7 +392,115 @@ export function SettingsScreen({
               />
             </fieldset>
 
-            <hr />
+            <hr className='my-4' />
+
+            <div className='row'>
+              <div className='col-md-5 my-1'>
+                <span className='h5'>{i18n.t('settings.tenCard', 'Ten Card')}</span><br />
+                <small id='ten-card-hint' className='text-info'>
+                  {i18n.t('settings.tenCardHint', 'Face of the 10 point value card')}
+                </small>
+              </div>
+              <div
+                className='col-md-7 my-1'
+                role='radiogroup'
+                aria-label={i18n.t('settings.tenCard', 'Ten point card')}
+                aria-describedby='ten-card-hint'
+              >
+                {[
+                  { value: TenCard.SEVEN, label: '7 (Default)' },
+                  { value: TenCard.THREE, label: '3 (Italo-Spanish)' },
+                  { value: TenCard.TEN, label: '10 (Kids)' },
+                ].map((option) => (
+                  <div className='form-check' key={option.value}>
+                    <input
+                      className='form-check-input'
+                      type='radio'
+                      name='ten-card'
+                      id={`ten-card-${option.value}`}
+                      checked={selectedTenCard === option.value}
+                      onChange={() => onTenCardChange(option.value)}
+                    />
+                    <label className='form-check-label' htmlFor={`ten-card-${option.value}`}>
+                      {niceCheckLabel(option.label)}
+                    </label>
+                  </div>
+                ))}
+              </div>
+
+              <div className='col-md-5 my-1'>
+                <span className='h5'>{i18n.t('settings.courtCardPoints', 'Royal Cards')}</span><br />
+                <small id='court-card-points-hint' className='text-info'>
+                  {i18n.t('settings.courtCardPointsHint', 'Face of 2 and 3 point value cards')}
+                </small>
+              </div>
+              <div
+                className='col-md-7 my-1'
+                role='radiogroup'
+                aria-label={i18n.t('settings.courtCardPoints', '2 & 3 point cards')}
+                aria-describedby='court-card-points-hint'
+              >
+                {[
+                  {
+                    value: CourtCardPoints.QUEEN_TWO_JACK_THREE,
+                    label: i18n.t('settings.courtCardPointsDefault', 'Q→2 ﹠ J→3 (Default)'),
+                  },
+                  {
+                    value: CourtCardPoints.JACK_TWO_QUEEN_THREE,
+                    label: i18n.t('settings.courtCardPointsAngloFrench', 'J→2 ﹠ Q→3 (Anglo-French)'),
+                  },
+                ].map((option) => (
+                  <div className='form-check' key={option.value}>
+                    <input
+                      className='form-check-input'
+                      type='radio'
+                      name='court-card-points'
+                      id={`court-card-points-${option.value}`}
+                      checked={selectedCourtCardPoints === option.value}
+                      onChange={() => onCourtCardPointsChange(option.value)}
+                    />
+                    <label className='form-check-label' htmlFor={`court-card-points-${option.value}`}>
+                      {niceCheckLabel(option.label)}
+                    </label>
+                  </div>
+                ))}
+                <small className='text-info'>K→4 for both</small>
+              </div>
+
+              <div className='col-md-5 my-1'>
+                <span className='h5'>{i18n.t('settings.scoreKeeping', 'Score keeping')}</span><br />
+                <small id='score-keeping-hint' className='text-info'>
+                  {i18n.t('settings.scoreKeepingHint', 'Traditional score keeping method')}
+                </small>
+              </div>
+              <div
+                className='col-md-7 my-1'
+                role='radiogroup'
+                aria-label={i18n.t('settings.scoreKeeping', 'Score keeping')}
+                aria-describedby='score-keeping-hint'
+              >
+                {[
+                  { value: ScoreKeeping.CROSSES, label: i18n.t('settings.scoreKeepingCrosses', 'Crosses') },
+                  { value: ScoreKeeping.COMBS, label: i18n.t('settings.scoreKeepingCombs', 'Combs') },
+                ].map((option) => (
+                  <div className='form-check' key={option.value}>
+                    <input
+                      className='form-check-input'
+                      type='radio'
+                      name='score-keeping'
+                      id={`score-keeping-${option.value}`}
+                      checked={selectedScoreKeeping === option.value}
+                      onChange={() => onScoreKeepingChange(option.value)}
+                    />
+                    <label className='form-check-label' htmlFor={`score-keeping-${option.value}`}>
+                      {niceCheckLabel(option.label)}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <hr className='my-4' />
 
             <div className='text-right'>
               <button

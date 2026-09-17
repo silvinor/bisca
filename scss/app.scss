@@ -13,7 +13,8 @@
 
 @import "variables";
 
-/* The Preact host owns the runtime-configurable table background. */
+// The Preact host owns the runtime-configurable table background.
+
 #app {
   position: fixed;
   inset: 0;
@@ -70,6 +71,30 @@
   overflow: auto;
 }
 
+.app-footer {
+  color: white;
+  opacity: .5;
+}
+
+// body special cases
+body {
+  &.settings,
+  &.help,
+  &.welcome {
+    .app-header {
+      display: none;
+    }
+  }
+
+  &.welcome {
+    .app-footer {
+      display: none;
+    }
+  }
+}
+
+// ----- DEBUG SPECIAL CASES -----
+
 .xdebug {
   .app-header,
   .app-footer {
@@ -79,11 +104,6 @@
   .surface {
     outline: 1px dashed red;
   }
-}
-
-.app-footer {
-  color: white;
-  opacity: .5;
 }
 
 .surface {
@@ -284,11 +304,20 @@
   h1, h2, h3 {
     margin-bottom: 1rem;
     text-decoration: underline;
+    text-decoration-color: #678;
+    text-decoration-style: wavy;
+    text-decoration-thickness: from-font;
   }
 
   h2, h3 {
     margin-top: 1rem;
   }
+
+  h1 { font-size: 1.75em; }
+  h2 { font-size: 1.5em; }
+  h3 { font-size: 1.25em; }
+  h4 { font-size: 1.125em; }
+  h5, h6 { font-size: 1em; }
 
   .footnotes {
     font-size: 80%;

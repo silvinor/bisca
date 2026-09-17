@@ -67,6 +67,22 @@ export enum TableTexture {
   DIGITAL = 'digital',
 }
 
+export enum TenCard {
+  SEVEN = 0,
+  THREE = 1,
+  TEN = 2,
+}
+
+export enum CourtCardPoints {
+  QUEEN_TWO_JACK_THREE = 0,
+  JACK_TWO_QUEEN_THREE = 1,
+}
+
+export enum ScoreKeeping {
+  COMBS = 0,
+  CROSSES = 2,
+}
+
 export enum GameScreen {
   WELCOME = 'welcome',
   INTRO = 'intro',
@@ -119,6 +135,9 @@ export const DEFAULT_GAME_DECK = 'default';
 export const DEFAULT_CARD_BACK = 'a';
 export const DEFAULT_TABLE_COLOR = TableColor.GREEN;
 export const DEFAULT_TABLE_TEXTURE = TableTexture.FELT;
+export const DEFAULT_TEN_CARD = TenCard.SEVEN;
+export const DEFAULT_COURT_CARD_POINTS = CourtCardPoints.QUEEN_TWO_JACK_THREE;
+export const DEFAULT_SCORE_KEEPING = ScoreKeeping.COMBS;
 export const MAX_CARD_BACKS = 26;
 
 export type PersistedSection =

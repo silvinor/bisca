@@ -1,5 +1,7 @@
 # How to play Bisca
 
+> 🇵🇹 **Bisca** / 🇮🇹 **Briscola** / 🇪🇸 **Brisca** / 🇭🇷 🇸🇮 **Briškula**
+
 ## The Game
 
 > The rules below are the ones the author learned in his region. Bisca is played a little differently from region to region, and this version of the app does not try to cover every local variation.
@@ -48,7 +50,25 @@ In Bisca (and Sueca), the goal is to win *tricks* containing valuable cards. The
 
 {.table}
 
-In Sueca, a team needs more than 60 points to win a game, and 91 or more points counts as two games.
+### Scoring
+
+A game win is more than 60 points. The winner of each game scores one game point. 
+
+If a game ends 60–60, nobody scores, and the game is replayed. The first to reach 4 game points wins the set, and the next set starts again from zero.
+
+Some modes score two game points for a large win instead: 82 or more card points in Nine's Bisca, and 91 or more in Sueca (and 120 points wins the 4 game set outright).
+
+### Score keeping
+
+The score is kept using one of two methods:
+
+- **Crosses and dots** ("Cruzes e pontos"): two crosses are drawn, marked *Us* ("Nós") and *Them* ("Eles"). Each game won is marked with a dot on one of the outer points of the cross. The first side to fill all four points wins the set.
+- **Comb and dots** ("Pente e pontos"): a "comb" is drawn as a horizontal line crossed by four vertical lines, one for each game of the set. Each game won is marked with a dot on a vertical line: above the horizontal line for your own wins, and below it for your opponent's. Combs are also often drawn with 10 lines, for a match played to 10 games.
+
+### Variations
+
+1. The **Ten**-point card is the 7 in Portuguese Bisca, while related Italian and Spanish games use the 3. The 10 card *can* also be used as a simpler children's variant.
+2. **Royal** cards normally map the Jack to the three-point knight and the Queen to the two-point knave. With **Anglo-French** cards, these values *can* be swapped because their familiar King–Queen–Jack order makes the Queen appear higher than the Jack; the Queen is then worth three-points and the Jack two-points.
 
 ## Game Mode <span class="small">(Variations)</span>{#game_mode}
 
@@ -88,17 +108,6 @@ This setting controls how long a match lasts. A *game* is one deal: the deck is 
 | First to Four | Up to 7 sets are played. The first side to win 4 sets wins the match. |
 
 {.table}
-
-### Scoring
-
-The winner of each game scores one game point. Some modes score two game points for a large win instead: 82 or more card points in Nine's Bisca, and 91 or more in Sueca. If a game ends 60–60, nobody scores, and the game is replayed. The first to reach 4 game points wins the set, and the next set starts again from zero.
-
-### Score keeping
-
-The score is kept using one of two methods:
-
-- **Crosses and dots** ("Cruzes e pontos"): two crosses are drawn, marked *Us* ("Nós") and *Them* ("Eles"). Each game won is marked with a dot on one of the outer points of the cross. The first side to fill all four points wins the set.
-- **Comb and dots** ("Pente e pontos"): a "comb" is drawn as a horizontal line crossed by four vertical lines, one for each game of the set. Each game won is marked with a dot on a vertical line: above the horizontal line for your own wins, and below it for your opponent's. Combs are also often drawn with 10 lines, for a match played to 10 games.
 
 <!--
 

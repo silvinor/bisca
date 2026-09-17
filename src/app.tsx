@@ -7,9 +7,12 @@ import {
   APP_BAR_HEIGHT_REM,
   APP_COPYRIGHT_HOLDER,
   DEFAULT_CARD_BACK,
+  DEFAULT_COURT_CARD_POINTS,
   DEFAULT_GAME_DECK,
+  DEFAULT_SCORE_KEEPING,
   DEFAULT_TABLE_COLOR,
   DEFAULT_TABLE_TEXTURE,
+  DEFAULT_TEN_CARD,
   GameScreen,
   GameStateAction,
   LEGACY_PERSISTENCE_SECTIONS,
@@ -18,8 +21,11 @@ import {
   TABLE_COLOR_HEX,
   TABLE_SPOTLIGHT_PATH,
   TABLE_TEXTURE_PATH,
+  CourtCardPoints,
+  ScoreKeeping,
   TableColor,
   TableTexture,
+  TenCard,
 } from './core/constants'
 import { APP_BUILD, APP_VERSION, APP_YEAR } from './core/version'
 import {
@@ -45,6 +51,13 @@ const isTableColor = (value: unknown): value is TableColor =>
   typeof value === 'string' && Object.values(TableColor).some((tableColor) => tableColor === value)
 const isTableTexture = (value: unknown): value is TableTexture =>
   typeof value === 'string' && Object.values(TableTexture).some((texture) => texture === value)
+const isTenCard = (value: unknown): value is TenCard =>
+  value === TenCard.SEVEN || value === TenCard.THREE || value === TenCard.TEN
+const isCourtCardPoints = (value: unknown): value is CourtCardPoints =>
+  value === CourtCardPoints.QUEEN_TWO_JACK_THREE
+  || value === CourtCardPoints.JACK_TWO_QUEEN_THREE
+const isScoreKeeping = (value: unknown): value is ScoreKeeping =>
+  value === ScoreKeeping.COMBS || value === ScoreKeeping.CROSSES
 type CardBackSelections = Record<string, string>
 const isCardBackSelections = (value: unknown): value is CardBackSelections =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -55,12 +68,21 @@ interface PersistedSettings {
   cardBacks: CardBackSelections
   tableColor: TableColor
   tableTexture: TableTexture
+  tenCard: TenCard
+  courtCardPoints: CourtCardPoints
+  scoreKeeping: ScoreKeeping
 }
 
-type StoredSettings = Omit<PersistedSettings, 'tableColor' | 'tableTexture'> & {
+type StoredSettings = Omit<
+  PersistedSettings,
+  'tableColor' | 'tableTexture' | 'tenCard' | 'courtCardPoints' | 'scoreKeeping'
+> & {
   open?: boolean
   tableColor?: TableColor
   tableTexture?: TableTexture
+  tenCard?: TenCard
+  courtCardPoints?: CourtCardPoints
+  scoreKeeping?: ScoreKeeping
 }
 
 const isStoredSettings = (value: unknown): value is StoredSettings => {
@@ -71,6 +93,9 @@ const isStoredSettings = (value: unknown): value is StoredSettings => {
     && (settings.open === undefined || isBoolean(settings.open))
     && (settings.tableColor === undefined || isTableColor(settings.tableColor))
     && (settings.tableTexture === undefined || isTableTexture(settings.tableTexture))
+    && (settings.tenCard === undefined || isTenCard(settings.tenCard))
+    && (settings.courtCardPoints === undefined || isCourtCardPoints(settings.courtCardPoints))
+    && (settings.scoreKeeping === undefined || isScoreKeeping(settings.scoreKeeping))
 }
 
 function loadSettings(): PersistedSettings {
@@ -81,8 +106,18 @@ function loadSettings(): PersistedSettings {
       cardBacks: stored.cardBacks,
       tableColor: stored.tableColor ?? DEFAULT_TABLE_COLOR,
       tableTexture: stored.tableTexture ?? DEFAULT_TABLE_TEXTURE,
+      tenCard: stored.tenCard ?? DEFAULT_TEN_CARD,
+      courtCardPoints: stored.courtCardPoints ?? DEFAULT_COURT_CARD_POINTS,
+      scoreKeeping: stored.scoreKeeping ?? DEFAULT_SCORE_KEEPING,
     }
-    if (stored.open !== undefined || stored.tableColor === undefined || stored.tableTexture === undefined) {
+    if (
+      stored.open !== undefined
+      || stored.tableColor === undefined
+      || stored.tableTexture === undefined
+      || stored.tenCard === undefined
+      || stored.courtCardPoints === undefined
+      || stored.scoreKeeping === undefined
+    ) {
       persistanceEngine.save(PERSISTENCE_SECTION_SETTINGS, normalized)
     }
     persistanceEngine.clearLegacy(LEGACY_PERSISTENCE_SECTIONS)
@@ -99,6 +134,9 @@ function loadSettings(): PersistedSettings {
       : cardBacks,
     tableColor: DEFAULT_TABLE_COLOR,
     tableTexture: DEFAULT_TABLE_TEXTURE,
+    tenCard: DEFAULT_TEN_CARD,
+    courtCardPoints: DEFAULT_COURT_CARD_POINTS,
+    scoreKeeping: DEFAULT_SCORE_KEEPING,
   }
   persistanceEngine.save(PERSISTENCE_SECTION_SETTINGS, migrated)
   persistanceEngine.clearLegacy(LEGACY_PERSISTENCE_SECTIONS)
@@ -139,6 +177,13 @@ export function App() {
   const [gameState, setGameState] = useState<GameState>(loadGameState)
   const [settings, setSettings] = useState<PersistedSettings>(loadSettings)
   const cardBack = settings.cardBacks[settings.gameDeck] ?? DEFAULT_CARD_BACK
+
+  useLayoutEffect(() => {
+    const gameStateClass = gameState.screen.toLowerCase()
+    document.body.classList.add(gameStateClass)
+
+    return () => document.body.classList.remove(gameStateClass)
+  }, [gameState.screen])
 
   useLayoutEffect(() => {
     const app = document.getElementById('app')
@@ -204,6 +249,18 @@ export function App() {
 
   const selectTableTexture = (tableTexture: TableTexture) => {
     updateSettings((current) => ({ ...current, tableTexture }))
+  }
+
+  const selectTenCard = (tenCard: TenCard) => {
+    updateSettings((current) => ({ ...current, tenCard }))
+  }
+
+  const selectCourtCardPoints = (courtCardPoints: CourtCardPoints) => {
+    updateSettings((current) => ({ ...current, courtCardPoints }))
+  }
+
+  const selectScoreKeeping = (scoreKeeping: ScoreKeeping) => {
+    updateSettings((current) => ({ ...current, scoreKeeping }))
   }
 
   const handleWelcomeComplete = () => {
@@ -286,6 +343,12 @@ export function App() {
           onTableColorChange={selectTableColor}
           selectedTableTexture={settings.tableTexture}
           onTableTextureChange={selectTableTexture}
+          selectedTenCard={settings.tenCard}
+          onTenCardChange={selectTenCard}
+          selectedCourtCardPoints={settings.courtCardPoints}
+          onCourtCardPointsChange={selectCourtCardPoints}
+          selectedScoreKeeping={settings.scoreKeeping}
+          onScoreKeepingChange={selectScoreKeeping}
         />,
         document.body,
       )}
