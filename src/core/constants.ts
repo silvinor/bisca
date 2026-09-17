@@ -6,14 +6,17 @@
 
 /* General */
 export const APP_NAME_FALLBACK = "Bisca"; // Name of App if not in language file
+export const APP_COPYRIGHT_HOLDER = 'Silvino R.';
+export const APP_BAR_HEIGHT_REM = 1.5;
+export const DEBUG_BODY_CLASS = 'debug';
 export const PLAYING_SURFACE_ASPECT_RATIO = 3 / 2;
 export const WELCOME_AMBIGRAM_PATH = '/assets/img/ambigram.svg';
 export const WELCOME_ANIMATION_DURATION_MS = 3_000;
+export const WELCOME_COMPLETION_DELAY_MS = 2_000;
 export const WELCOME_ANIMATION_START_SIZE_PERCENT = 20;
 export const WELCOME_ANIMATION_END_SIZE_PERCENT = 80;
-export const WELCOME_ANIMATION_START_ROTATION_DEGREES = -90;
-export const WELCOME_ANIMATION_ROTATION_DEGREES = 270;
-export const WELCOME_COMPLETION_DELAY_MS = 1_000;
+export const WELCOME_ANIMATION_START_ROTATION_DEGREES = -270;
+export const WELCOME_ANIMATION_STOP_ROTATION_DEGREES = 0;
 
 /* File handling */
 export const APP_LANGUAGE_PATH = "/lang";
@@ -76,6 +79,7 @@ export enum GameScreen {
 
 export enum GameStateAction {
   WELCOME_COMPLETE = 'welcome-complete',
+  RETURN_TO_WELCOME = 'return-to-welcome',
   OPEN_HELP = 'open-help',
   CLOSE_HELP = 'close-help',
   OPEN_SETTINGS = 'open-settings',

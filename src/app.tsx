@@ -4,6 +4,8 @@
 import { useLayoutEffect, useState } from 'preact/hooks'
 import { createPortal } from 'preact/compat'
 import {
+  APP_BAR_HEIGHT_REM,
+  APP_COPYRIGHT_HOLDER,
   DEFAULT_CARD_BACK,
   DEFAULT_GAME_DECK,
   DEFAULT_TABLE_COLOR,
@@ -19,6 +21,7 @@ import {
   TableColor,
   TableTexture,
 } from './core/constants'
+import { APP_BUILD, APP_VERSION, APP_YEAR } from './core/version'
 import {
   INITIAL_GAME_STATE,
   isGameState,
@@ -26,6 +29,7 @@ import {
   type GameState,
 } from './core/game-state-engine'
 import { persistanceEngine } from './core/persistance-engine'
+import { i18n } from './core/i18n'
 import { Table } from './ui/table'
 import { IntroScreen } from './ui/intro-screen'
 import { SettingsScreen } from './ui/settings-screen'
@@ -145,18 +149,25 @@ export function App() {
       backgroundImage: app.style.backgroundImage,
       backgroundSize: app.style.backgroundSize,
       backgroundRepeat: app.style.backgroundRepeat,
+      appBarHeight: app.style.getPropertyValue('--app-bar-height'),
     }
 
     app.style.backgroundColor = TABLE_COLOR_HEX[settings.tableColor]
     app.style.backgroundImage = `url(${TABLE_SPOTLIGHT_PATH}), url(${TABLE_TEXTURE_PATH[settings.tableTexture]})`
     app.style.backgroundSize = '100% 100%, auto'
     app.style.backgroundRepeat = 'no-repeat, repeat'
+    app.style.setProperty('--app-bar-height', `${APP_BAR_HEIGHT_REM}rem`)
 
     return () => {
       app.style.backgroundColor = previous.backgroundColor
       app.style.backgroundImage = previous.backgroundImage
       app.style.backgroundSize = previous.backgroundSize
       app.style.backgroundRepeat = previous.backgroundRepeat
+      if (previous.appBarHeight) {
+        app.style.setProperty('--app-bar-height', previous.appBarHeight)
+      } else {
+        app.style.removeProperty('--app-bar-height')
+      }
     }
   }, [settings.tableColor, settings.tableTexture])
 
@@ -195,6 +206,21 @@ export function App() {
     updateSettings((current) => ({ ...current, tableTexture }))
   }
 
+  const handleWelcomeComplete = () => {
+    transition(GameStateAction.WELCOME_COMPLETE)
+  }
+
+  const handleHeaderClose = () => {
+    // TODO: Replace this with progression-aware close behavior once gameplay is implemented.
+  
+    if (gameState.screen === GameScreen.WELCOME) {
+      handleWelcomeComplete()
+      return
+    }
+
+    transition(GameStateAction.RETURN_TO_WELCOME)
+  }
+
   const introVisible = [
     GameScreen.INTRO,
     GameScreen.HELP,
@@ -203,36 +229,51 @@ export function App() {
 
   return (
     <>
-      <Table>
-        {gameState.screen === GameScreen.PLAYING ? (
-          // TODO : Start game engine
-          <p className='text-center text-white'>Game starting soon…</p>
-        ) : gameState.screen === GameScreen.YOU_WIN ? (
-          // TODO : Win animation
-          <p className='text-center text-white'>You win</p>
-        ) : gameState.screen === GameScreen.YOU_LOSE ? (
-          // TODO : Loss animation
-          <p className='text-center text-white'>You lose</p>
-        ) : null}
-      </Table>
-      {gameState.screen === GameScreen.WELCOME ? (
-        <div className='screen-overlay'>
-          <WelcomeScreen onContinue={() => transition(GameStateAction.WELCOME_COMPLETE)} />
-        </div>
-      ) : introVisible && (
-        <div className='screen-overlay'>
-          <IntroScreen
-            onStart={() => transition(GameStateAction.START_GAME)}
-            onSettings={() => transition(GameStateAction.OPEN_SETTINGS)}
-            onHelp={() => transition(GameStateAction.OPEN_HELP)}
-            cardDeck={settings.gameDeck}
-            cardBack={cardBack}
-            tableColor={TABLE_COLOR_HEX[settings.tableColor]}
-            tableTexture={TABLE_TEXTURE_PATH[settings.tableTexture]}
-            shortcutsEnabled={gameState.screen === GameScreen.INTRO}
-          />
-        </div>
-      )}
+      <header className='app-header p-1'>
+        <button
+          type='button'
+          className='app-close-button btn btn-outline-secondary xxxp-0 xxxm-1'
+          aria-label={i18n.t('intro.close', 'Close')}
+          onClick={handleHeaderClose}
+        >
+          <i className='fa-solid fa-xmark' aria-hidden='true' />
+        </button>
+      </header>
+      <main className='app-content'>
+        <Table>
+          {gameState.screen === GameScreen.PLAYING ? (
+            // TODO : Start game engine
+            <p className='text-center text-white'>Game starting soon…</p>
+          ) : gameState.screen === GameScreen.YOU_WIN ? (
+            // TODO : Win animation
+            <p className='text-center text-white'>You win</p>
+          ) : gameState.screen === GameScreen.YOU_LOSE ? (
+            // TODO : Loss animation
+            <p className='text-center text-white'>You lose</p>
+          ) : null}
+        </Table>
+        {gameState.screen === GameScreen.WELCOME ? (
+          <div className='screen-overlay'>
+            <WelcomeScreen onContinue={handleWelcomeComplete} />
+          </div>
+        ) : introVisible && (
+          <div className='screen-overlay'>
+            <IntroScreen
+              onStart={() => transition(GameStateAction.START_GAME)}
+              onSettings={() => transition(GameStateAction.OPEN_SETTINGS)}
+              onHelp={() => transition(GameStateAction.OPEN_HELP)}
+              cardDeck={settings.gameDeck}
+              cardBack={cardBack}
+              tableColor={TABLE_COLOR_HEX[settings.tableColor]}
+              tableTexture={TABLE_TEXTURE_PATH[settings.tableTexture]}
+              shortcutsEnabled={gameState.screen === GameScreen.INTRO}
+            />
+          </div>
+        )}
+      </main>
+      <footer className='app-footer'>
+        © {APP_YEAR} {APP_COPYRIGHT_HOLDER} <i class="fa-solid fa-ellipsis-vertical"></i> v{APP_VERSION} ({APP_BUILD})
+      </footer>
       {createPortal(
         <SettingsScreen
           open={gameState.screen === GameScreen.SETTINGS}

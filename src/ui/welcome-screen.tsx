@@ -7,9 +7,9 @@ import {
   WELCOME_AMBIGRAM_PATH,
   WELCOME_ANIMATION_DURATION_MS,
   WELCOME_ANIMATION_END_SIZE_PERCENT,
-  WELCOME_ANIMATION_ROTATION_DEGREES,
   WELCOME_ANIMATION_START_ROTATION_DEGREES,
   WELCOME_ANIMATION_START_SIZE_PERCENT,
+  WELCOME_ANIMATION_STOP_ROTATION_DEGREES,
   WELCOME_COMPLETION_DELAY_MS,
 } from '../core/constants';
 import { i18n } from '../core/i18n';
@@ -70,7 +70,7 @@ export function WelcomeScreen({ onContinue }: WelcomeScreenProps) {
         '--welcome-animation-start-size': `${WELCOME_ANIMATION_START_SIZE_PERCENT}%`,
         '--welcome-animation-end-size': `${WELCOME_ANIMATION_END_SIZE_PERCENT}%`,
         '--welcome-animation-start-rotation': `${WELCOME_ANIMATION_START_ROTATION_DEGREES}deg`,
-        '--welcome-animation-rotation': `${WELCOME_ANIMATION_ROTATION_DEGREES}deg`,
+        '--welcome-animation-stop-rotation': `${WELCOME_ANIMATION_STOP_ROTATION_DEGREES}deg`,
       }}
     >
       <img

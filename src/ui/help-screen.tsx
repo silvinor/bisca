@@ -69,12 +69,12 @@ export function HelpScreen({ open, onClose }: HelpScreenProps) {
     setLoadError(false);
 
     const loadHelp = async () => {
-      const [markdown, { marked }] = await Promise.all([
+      const [markdown, { renderHelpMarkdown }] = await Promise.all([
         loadHelpMarkdown(controller.signal),
-        import('marked'),
+        import('./help-markdown'),
       ]);
       const { title, body } = extractHelpHeading(markdown);
-      const html = await marked.parse(body);
+      const html = renderHelpMarkdown(body);
       if (!controller.signal.aborted) {
         setHelpHeading(title);
         setHelpHtml(html);
@@ -139,7 +139,7 @@ export function HelpScreen({ open, onClose }: HelpScreenProps) {
       aria-hidden='true'
       aria-labelledby='help-modal-title'
     >
-      <div className='modal-dialog modal-lg modal-xl modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down'>
+      <div className='modal-dialog modal-xl modal-fullscreen-md-down modal-dialog-centered modal-dialog-scrollable'>
         <div className='modal-content'>
           <div className='modal-header'>
             <h2 className='modal-title fs-5' id='help-modal-title'>

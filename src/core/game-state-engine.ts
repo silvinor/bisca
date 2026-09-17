@@ -46,6 +46,12 @@ export function isGameState(value: unknown): value is GameState {
 }
 
 export function transitionGameState(state: GameState, action: GameStateAction): GameState {
+  if (action === GameStateAction.RETURN_TO_WELCOME) {
+    return state.screen === GameScreen.WELCOME
+      ? state
+      : { ...state, screen: GameScreen.WELCOME };
+  }
+
   const nextScreen = TRANSITIONS[state.screen][action];
   return nextScreen === undefined ? state : { ...state, screen: nextScreen };
 }

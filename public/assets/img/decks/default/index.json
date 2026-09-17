@@ -1,5 +1,7 @@
 {
   "label": "Default",
   "description": "Bisca's (the app) default card deck, by @SilvinoR",
-  "backs": 13
+  "backs": 13,
+  "width": 750,
+  "height": 1050
 }

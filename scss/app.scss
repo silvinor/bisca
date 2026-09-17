@@ -18,9 +18,72 @@
   position: fixed;
   inset: 0;
   display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-header,
+.app-footer {
+  position: sticky;
+  z-index: 2;
+}
+
+.app-header {
+  top: 0;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: var(--app-bar-height);
+}
+
+.app-close-button {
+  // display: flex;
+  // align-items: center;
+  // justify-content: center;
+  // width: var(--app-bar-height);
+  // height: var(--app-bar-height);
+  // color: inherit;
+  // line-height: 1;
+}
+
+.app-footer {
+  bottom: 0;
+  display: flex;
+  flex: 0 0 var(--app-bar-height);
   align-items: center;
   justify-content: center;
+  height: var(--app-bar-height);
+  font-size: $font-size-sm;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.app-content {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
   overflow: auto;
+}
+
+.xdebug {
+  .app-header,
+  .app-footer {
+    outline: 1px dotted red;
+  }
+
+  .surface {
+    outline: 1px dashed red;
+  }
+}
+
+.app-footer {
+  color: white;
+  opacity: .5;
 }
 
 .surface {
@@ -71,9 +134,7 @@
 
   to {
     width: var(--welcome-animation-end-size);
-    transform: rotate(calc(
-      var(--welcome-animation-start-rotation) + var(--welcome-animation-rotation)
-    ));
+    transform: rotate(var(--welcome-animation-stop-rotation));
   }
 }
 
@@ -207,4 +268,58 @@
 .toggle-input:focus + .toggle-option {
   box-shadow: var(--bs-focus-ring-x, 0) var(--bs-focus-ring-y, 0) var(--bs-focus-ring-blur, 0)
     var(--bs-focus-ring-width) var(--bs-focus-ring-color);
+}
+
+.help-modal-body {
+
+  .help-card-face {
+    > img {
+      // Same border as Bootstrap's .card, plus a small shadow
+      border: var(--#{$prefix}border-width) solid var(--#{$prefix}border-color-translucent);
+      border-radius: var(--#{$prefix}border-radius);
+      box-shadow: var(--#{$prefix}box-shadow-sm);
+    }
+  }
+
+  h1, h2, h3 {
+    margin-bottom: 1rem;
+    text-decoration: underline;
+  }
+
+  h2, h3 {
+    margin-top: 1rem;
+  }
+
+  .footnotes {
+    font-size: 80%;
+    opacity: .8;
+  }
+
+  .asterism {
+    // Hide the "⁂" text and show the four suit pips instead
+    font-size: 0;
+    line-height: 0;
+    margin-block: 1.5rem;
+
+    &::before {
+      // ♠ ♥ ♣ ♦ (U+FE0E keeps them as text, not emoji)
+      content: "\2660\FE0E\2003\2665\FE0E\2003\2663\FE0E\2003\2666\FE0E";
+      font-size: 1.25rem;
+      line-height: 1.5;
+    }
+  }
+
+  .table {
+    // width: inherit;
+    // min-width: 75%;
+    // max-width: 75%;
+    width: 80%;
+    margin: 0 auto;
+    margin-bottom: 1rem;
+
+    @include media-breakpoint-down(md) {
+      width: 100%;
+    }
+  }
+
 }

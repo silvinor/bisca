@@ -21,4 +21,10 @@ stateDiagram-v2
     YouWin --> ResultsComplete: Continue
     YouLose --> ResultsComplete: Continue
     ResultsComplete --> Intro
+    Intro --> Welcome: Header close
+    Help --> Welcome: Header close
+    Settings --> Welcome: Header close
+    Playing --> Welcome: Header close
+    YouWin --> Welcome: Header close
+    YouLose --> Welcome: Header close
 ```
