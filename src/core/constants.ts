@@ -17,6 +17,14 @@ export const WELCOME_ANIMATION_START_SIZE_PERCENT = 20;
 export const WELCOME_ANIMATION_END_SIZE_PERCENT = 80;
 export const WELCOME_ANIMATION_START_ROTATION_DEGREES = -270;
 export const WELCOME_ANIMATION_STOP_ROTATION_DEGREES = 0;
+export const WELCOME_ANIMATION_EASE = 'inOutQuad';
+
+/* Game engine */
+export const UNKNOWN_DEALER = -1;
+
+/* Animation */
+export const ANIMATION_REDUCED_MOTION_SCOPE_KEY = 'reducedMotion';
+export const ANIMATION_REDUCED_MOTION_MEDIA_QUERY = '(prefers-reduced-motion: reduce)';
 
 /* File handling */
 export const APP_LANGUAGE_PATH = "/lang";
@@ -93,7 +101,7 @@ export enum GameScreen {
   YOU_LOSE = 'you-lose',
 }
 
-export enum GameStateAction {
+export enum ScreenStateAction {
   WELCOME_COMPLETE = 'welcome-complete',
   RETURN_TO_WELCOME = 'return-to-welcome',
   OPEN_HELP = 'open-help',
@@ -117,9 +125,10 @@ export const TABLE_TEXTURE_PATH: Record<TableTexture, string> = {
 export const TABLE_SPOTLIGHT_PATH = '/assets/img/table/_spotlight.png';
 
 /* Local storage */
-export const PERSISTENCE_SECTION_STARTUP = 'startup';
-export const PERSISTENCE_SECTION_GAME_STATE = 'game';
-export const PERSISTENCE_SECTION_SETTINGS = 'settings';
+export const PERSISTENCE_GAME_MODE = 'mode';
+export const PERSISTENCE_SCREEN_STATE = 'screen';
+export const PERSISTENCE_GAME_ENGINE = 'game';
+export const PERSISTENCE_SETTINGS = 'settings';
 export const PERSISTENCE_STORAGE_VERSION = 1;
 export const PERSISTENCE_STORAGE_PREFIX = 'bisca';
 
@@ -141,8 +150,9 @@ export const DEFAULT_SCORE_KEEPING = ScoreKeeping.COMBS;
 export const MAX_CARD_BACKS = 26;
 
 export type PersistedSection =
-  | typeof PERSISTENCE_SECTION_STARTUP
-  | typeof PERSISTENCE_SECTION_GAME_STATE
-  | typeof PERSISTENCE_SECTION_SETTINGS;
+  | typeof PERSISTENCE_GAME_MODE
+  | typeof PERSISTENCE_SCREEN_STATE
+  | typeof PERSISTENCE_GAME_ENGINE
+  | typeof PERSISTENCE_SETTINGS;
 
 export type LegacyPersistedSection = typeof LEGACY_PERSISTENCE_SECTIONS[number];

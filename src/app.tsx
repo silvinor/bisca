@@ -14,10 +14,10 @@ import {
   DEFAULT_TABLE_TEXTURE,
   DEFAULT_TEN_CARD,
   GameScreen,
-  GameStateAction,
+  ScreenStateAction,
   LEGACY_PERSISTENCE_SECTIONS,
-  PERSISTENCE_SECTION_GAME_STATE,
-  PERSISTENCE_SECTION_SETTINGS,
+  PERSISTENCE_SCREEN_STATE,
+  PERSISTENCE_SETTINGS,
   TABLE_COLOR_HEX,
   TABLE_SPOTLIGHT_PATH,
   TABLE_TEXTURE_PATH,
@@ -29,11 +29,11 @@ import {
 } from './core/constants'
 import { APP_BUILD, APP_VERSION, APP_YEAR } from './core/version'
 import {
-  INITIAL_GAME_STATE,
-  isGameState,
-  transitionGameState,
-  type GameState,
-} from './core/game-state-engine'
+  INITIAL_SCREEN_STATE,
+  isScreenState,
+  transitionScreenState,
+  type ScreenState,
+} from './core/screen-state-engine'
 import { persistanceEngine } from './core/persistance-engine'
 import { i18n } from './core/i18n'
 import { Table } from './ui/table'
@@ -41,6 +41,7 @@ import { IntroScreen } from './ui/intro-screen'
 import { SettingsScreen } from './ui/settings-screen'
 import { HelpScreen } from './ui/help-screen'
 import { WelcomeScreen } from './ui/welcome-screen'
+import { PlayScreen } from './ui/play-screen'
 
 const isBoolean = (value: unknown): value is boolean => typeof value === 'boolean'
 const isDeckId = (value: unknown): value is string =>
@@ -99,7 +100,7 @@ const isStoredSettings = (value: unknown): value is StoredSettings => {
 }
 
 function loadSettings(): PersistedSettings {
-  const stored = persistanceEngine.load(PERSISTENCE_SECTION_SETTINGS, isStoredSettings)
+  const stored = persistanceEngine.load(PERSISTENCE_SETTINGS, isStoredSettings)
   if (stored) {
     const normalized: PersistedSettings = {
       gameDeck: stored.gameDeck,
@@ -118,7 +119,7 @@ function loadSettings(): PersistedSettings {
       || stored.courtCardPoints === undefined
       || stored.scoreKeeping === undefined
     ) {
-      persistanceEngine.save(PERSISTENCE_SECTION_SETTINGS, normalized)
+      persistanceEngine.save(PERSISTENCE_SETTINGS, normalized)
     }
     persistanceEngine.clearLegacy(LEGACY_PERSISTENCE_SECTIONS)
     return normalized
@@ -138,7 +139,7 @@ function loadSettings(): PersistedSettings {
     courtCardPoints: DEFAULT_COURT_CARD_POINTS,
     scoreKeeping: DEFAULT_SCORE_KEEPING,
   }
-  persistanceEngine.save(PERSISTENCE_SECTION_SETTINGS, migrated)
+  persistanceEngine.save(PERSISTENCE_SETTINGS, migrated)
   persistanceEngine.clearLegacy(LEGACY_PERSISTENCE_SECTIONS)
   return migrated
 }
@@ -152,38 +153,38 @@ const hasSettingsVisibility = (value: unknown): value is LegacySettingsVisibilit
   return isBoolean((value as Record<string, unknown>).open)
 }
 
-function loadGameState(): GameState {
-  const stored = persistanceEngine.load(PERSISTENCE_SECTION_GAME_STATE, isGameState)
+function loadScreenState(): ScreenState {
+  const stored = persistanceEngine.load(PERSISTENCE_SCREEN_STATE, isScreenState)
   if (stored) {
     if (stored.screen === GameScreen.INTRO) {
-      persistanceEngine.save(PERSISTENCE_SECTION_GAME_STATE, INITIAL_GAME_STATE)
-      return INITIAL_GAME_STATE
+      persistanceEngine.save(PERSISTENCE_SCREEN_STATE, INITIAL_SCREEN_STATE)
+      return INITIAL_SCREEN_STATE
     }
     return stored
   }
 
-  const formerSettings = persistanceEngine.load(PERSISTENCE_SECTION_SETTINGS, hasSettingsVisibility)
+  const formerSettings = persistanceEngine.load(PERSISTENCE_SETTINGS, hasSettingsVisibility)
   const formerSettingsOpen = formerSettings?.open
     ?? persistanceEngine.loadLegacy('settings-screen', isBoolean)
     ?? false
   const initial = formerSettingsOpen
     ? { screen: GameScreen.SETTINGS }
-    : INITIAL_GAME_STATE
-  persistanceEngine.save(PERSISTENCE_SECTION_GAME_STATE, initial)
+    : INITIAL_SCREEN_STATE
+  persistanceEngine.save(PERSISTENCE_SCREEN_STATE, initial)
   return initial
 }
 
 export function App() {
-  const [gameState, setGameState] = useState<GameState>(loadGameState)
+  const [screenState, setScreenState] = useState<ScreenState>(loadScreenState)
   const [settings, setSettings] = useState<PersistedSettings>(loadSettings)
   const cardBack = settings.cardBacks[settings.gameDeck] ?? DEFAULT_CARD_BACK
 
   useLayoutEffect(() => {
-    const gameStateClass = gameState.screen.toLowerCase()
-    document.body.classList.add(gameStateClass)
+    const screenStateClass = screenState.screen.toLowerCase()
+    document.body.classList.add(screenStateClass)
 
-    return () => document.body.classList.remove(gameStateClass)
-  }, [gameState.screen])
+    return () => document.body.classList.remove(screenStateClass)
+  }, [screenState.screen])
 
   useLayoutEffect(() => {
     const app = document.getElementById('app')
@@ -216,10 +217,10 @@ export function App() {
     }
   }, [settings.tableColor, settings.tableTexture])
 
-  const transition = (action: GameStateAction) => {
-    setGameState((current) => {
-      const next = transitionGameState(current, action)
-      if (next !== current) persistanceEngine.save(PERSISTENCE_SECTION_GAME_STATE, next)
+  const transition = (action: ScreenStateAction) => {
+    setScreenState((current) => {
+      const next = transitionScreenState(current, action)
+      if (next !== current) persistanceEngine.save(PERSISTENCE_SCREEN_STATE, next)
       return next
     })
   }
@@ -227,7 +228,7 @@ export function App() {
   const updateSettings = (update: (current: PersistedSettings) => PersistedSettings) => {
     setSettings((current) => {
       const next = update(current)
-      persistanceEngine.save(PERSISTENCE_SECTION_SETTINGS, next)
+      persistanceEngine.save(PERSISTENCE_SETTINGS, next)
       return next
     })
   }
@@ -264,25 +265,25 @@ export function App() {
   }
 
   const handleWelcomeComplete = () => {
-    transition(GameStateAction.WELCOME_COMPLETE)
+    transition(ScreenStateAction.WELCOME_COMPLETE)
   }
 
   const handleHeaderClose = () => {
     // TODO: Replace this with progression-aware close behavior once gameplay is implemented.
   
-    if (gameState.screen === GameScreen.WELCOME) {
+    if (screenState.screen === GameScreen.WELCOME) {
       handleWelcomeComplete()
       return
     }
 
-    transition(GameStateAction.RETURN_TO_WELCOME)
+    transition(ScreenStateAction.RETURN_TO_WELCOME)
   }
 
   const introVisible = [
     GameScreen.INTRO,
     GameScreen.HELP,
     GameScreen.SETTINGS,
-  ].includes(gameState.screen)
+  ].includes(screenState.screen)
 
   return (
     <>
@@ -298,32 +299,31 @@ export function App() {
       </header>
       <main className='app-content'>
         <Table>
-          {gameState.screen === GameScreen.PLAYING ? (
-            // TODO : Start game engine
-            <p className='text-center text-white'>Game starting soon…</p>
-          ) : gameState.screen === GameScreen.YOU_WIN ? (
+          {screenState.screen === GameScreen.PLAYING ? (
+            <PlayScreen />
+          ) : screenState.screen === GameScreen.YOU_WIN ? (
             // TODO : Win animation
             <p className='text-center text-white'>You win</p>
-          ) : gameState.screen === GameScreen.YOU_LOSE ? (
+          ) : screenState.screen === GameScreen.YOU_LOSE ? (
             // TODO : Loss animation
             <p className='text-center text-white'>You lose</p>
           ) : null}
         </Table>
-        {gameState.screen === GameScreen.WELCOME ? (
+        {screenState.screen === GameScreen.WELCOME ? (
           <div className='screen-overlay'>
             <WelcomeScreen onContinue={handleWelcomeComplete} />
           </div>
         ) : introVisible && (
           <div className='screen-overlay'>
             <IntroScreen
-              onStart={() => transition(GameStateAction.START_GAME)}
-              onSettings={() => transition(GameStateAction.OPEN_SETTINGS)}
-              onHelp={() => transition(GameStateAction.OPEN_HELP)}
+              onStart={() => transition(ScreenStateAction.START_GAME)}
+              onSettings={() => transition(ScreenStateAction.OPEN_SETTINGS)}
+              onHelp={() => transition(ScreenStateAction.OPEN_HELP)}
               cardDeck={settings.gameDeck}
               cardBack={cardBack}
               tableColor={TABLE_COLOR_HEX[settings.tableColor]}
               tableTexture={TABLE_TEXTURE_PATH[settings.tableTexture]}
-              shortcutsEnabled={gameState.screen === GameScreen.INTRO}
+              shortcutsEnabled={screenState.screen === GameScreen.INTRO}
             />
           </div>
         )}
@@ -333,8 +333,8 @@ export function App() {
       </footer>
       {createPortal(
         <SettingsScreen
-          open={gameState.screen === GameScreen.SETTINGS}
-          onClose={() => transition(GameStateAction.CLOSE_SETTINGS)}
+          open={screenState.screen === GameScreen.SETTINGS}
+          onClose={() => transition(ScreenStateAction.CLOSE_SETTINGS)}
           selectedDeck={settings.gameDeck}
           onDeckChange={selectGameDeck}
           selectedCardBack={cardBack}
@@ -354,8 +354,8 @@ export function App() {
       )}
       {createPortal(
         <HelpScreen
-          open={gameState.screen === GameScreen.HELP}
-          onClose={() => transition(GameStateAction.CLOSE_HELP)}
+          open={screenState.screen === GameScreen.HELP}
+          onClose={() => transition(ScreenStateAction.CLOSE_HELP)}
         />,
         document.body,
       )}

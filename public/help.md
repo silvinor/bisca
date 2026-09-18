@@ -67,7 +67,7 @@ The score is kept using one of two methods:
 
 ### Variations
 
-1. The **Ten**-point card is the 7 in Portuguese Bisca, while related Italian and Spanish games use the 3. The 10 card *can* also be used as a simpler children's variant.
+1. The **Ten**-point card is the 7-face in Portuguese Bisca, while related Italian and Spanish games use the 3. The 10 card *can* also be used as a simpler children's variant.
 2. **Royal** cards normally map the Jack to the three-point knight and the Queen to the two-point knave. With **Anglo-French** cards, these values *can* be swapped because their familiar King–Queen–Jack order makes the Queen appear higher than the Jack; the Queen is then worth three-points and the Jack two-points.
 
 ## Game Mode <span class="small">(Variations)</span>{#game_mode}

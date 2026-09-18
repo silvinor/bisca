@@ -13,6 +13,9 @@
     "__css": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css",
     "css": "https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.css"
   },
+  "animejs": {
+    "js": "https://cdn.jsdelivr.net/npm/animejs@4.5.0/dist/bundles/anime.umd.min.js"
+  },
   "favicon": {
     "svg": "favicon.svg"
   }

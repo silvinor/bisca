@@ -1,0 +1,17 @@
+/**
+ * Sourced from: https://plus.excalidraw.com/excalifont
+ */
+
+@font-face {
+  font-family: "Excalifont";
+  src:
+    url("Excalifont-Regular.woff2") format("woff2"),
+    url("Excalifont-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+.font-excalifont {
+  font-family: Excalifont;
+}

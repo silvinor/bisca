@@ -13,6 +13,8 @@
 
 @import "variables";
 
+@import url("/assets/fnt/Excalifont.css");
+
 // The Preact host owns the runtime-configurable table background.
 
 #app {
@@ -140,22 +142,9 @@ body {
 
 .welcome-ambigram {
   display: block;
-  width: var(--welcome-animation-start-size);
   height: auto;
-  animation: welcome-ambigram-reveal var(--welcome-animation-duration) ease-in-out forwards;
   filter: drop-shadow(0 1.25rem 1rem rgba($black, .65));
-}
-
-@keyframes welcome-ambigram-reveal {
-  from {
-    width: var(--welcome-animation-start-size);
-    transform: rotate(var(--welcome-animation-start-rotation));
-  }
-
-  to {
-    width: var(--welcome-animation-end-size);
-    transform: rotate(var(--welcome-animation-stop-rotation));
-  }
+  will-change: transform;
 }
 
 /* Intro screen */

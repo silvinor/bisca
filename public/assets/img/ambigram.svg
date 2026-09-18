@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg viewBox="0 0 842 356" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <style>
-    .ambigram-background { fill: #222; }
+    .ambigram-background { fill: #DDD; }
     @media (prefers-color-scheme: dark) {
-      .ambigram-background { fill: #DDD; }
+      .ambigram-background { fill: #222; }
     }
     .ambigram { stroke: #EEE; }
     @media (prefers-color-scheme: dark) {

@@ -18,6 +18,7 @@ interface FaviconSettings {
 interface AppSettings {
   bootstrap?: ResourceSettings;
   fontawesome?: ResourceSettings;
+  animejs?: ResourceSettings;
   favicon?: FaviconSettings;
 }
 
@@ -25,6 +26,7 @@ class Settings {
   private settings: AppSettings | null = null;
   private isLoaded: boolean = false;
   private isBootstrapReady: boolean = false;
+  private isAnimeReady: boolean = false;
   private loadPromise: Promise<void> | null = null;
 
   async init(): Promise<void> {
@@ -85,6 +87,29 @@ class Settings {
     }).bootstrap;
     this.isBootstrapReady =
       bootstrapDependenciesLoaded && Boolean(bootstrap?.Dropdown);
+
+    // Load Anime.js before Preact renders so its UMD API is available through window.anime.
+    const animeJsUrls = this.toArray(this.settings.animejs?.js);
+    let animeDependenciesLoaded = animeJsUrls.length > 0;
+    for (const src of animeJsUrls) {
+      const loaded = await new Promise<boolean>((resolve) => {
+        this.injectJS(
+          src,
+          () => resolve(true),
+          () => {
+            console.error(`[Settings] Failed to load Anime.js dependency: ${src}`);
+            resolve(false);
+          },
+        );
+      });
+      animeDependenciesLoaded &&= loaded;
+    }
+    const anime = (window as Window & {
+      anime?: { createScope?: unknown; createTimeline?: unknown };
+    }).anime;
+    this.isAnimeReady = animeDependenciesLoaded
+      && typeof anime?.createScope === 'function'
+      && typeof anime?.createTimeline === 'function';
 
     // Inject Fontawesome
     this.toArray(this.settings.fontawesome?.css).forEach((src, i) =>
@@ -159,6 +184,11 @@ class Settings {
   /** Reports whether every configured Bootstrap dependency loaded and its dropdown API is available. */
   get bootstrapReady(): boolean {
     return this.isBootstrapReady;
+  }
+
+  /** Reports whether every configured Anime.js dependency loaded and its core API is available. */
+  get animeReady(): boolean {
+    return this.isAnimeReady;
   }
 }
 

@@ -1,4 +1,4 @@
-# Game state
+# Screen state
 
 The current screen is stored in the `bisca.game` persistence section. Screen changes must follow the transitions below.
 

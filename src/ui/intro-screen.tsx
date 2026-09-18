@@ -6,7 +6,7 @@ import {
   Difficulty,
   GameMode,
   MatchCount,
-  PERSISTENCE_SECTION_STARTUP,
+  PERSISTENCE_GAME_MODE,
 } from '../core/constants';
 import { i18n } from '../core/i18n';
 import { persistanceEngine } from '../core/persistance-engine';
@@ -22,10 +22,10 @@ export interface GameSetupOptions {
 }
 
 const GAME_MODES: { id: GameMode; image: string; labelKey: string; fallback: string }[] = [
-  { id: GameMode.MODE1, image: '/assets/img/menu/mode-1.png', labelKey: 'gameMode.mode1', fallback: 'Threes Bisca' },
-  { id: GameMode.MODE2, image: '/assets/img/menu/mode-2.png', labelKey: 'gameMode.mode2', fallback: 'Sevens Bisca' },
-  { id: GameMode.MODE3, image: '/assets/img/menu/mode-3.png', labelKey: 'gameMode.mode3', fallback: 'Nines Bisca' },
-  { id: GameMode.MODE4, image: '/assets/img/menu/mode-4.png', labelKey: 'gameMode.mode4', fallback: '3 Player Bisca' },
+  { id: GameMode.MODE1, image: '/assets/img/menu/mode-1.png', labelKey: 'gameMode.mode1', fallback: 'Three\'s Bisca' },
+  { id: GameMode.MODE2, image: '/assets/img/menu/mode-2.png', labelKey: 'gameMode.mode2', fallback: 'Seven\'s Bisca' },
+  { id: GameMode.MODE3, image: '/assets/img/menu/mode-3.png', labelKey: 'gameMode.mode3', fallback: 'Nine\'s Bisca' },
+  { id: GameMode.MODE4, image: '/assets/img/menu/mode-4.png', labelKey: 'gameMode.mode4', fallback: 'Three-player Bisca' },
   { id: GameMode.MODE5, image: '/assets/img/menu/mode-5.png', labelKey: 'gameMode.mode5', fallback: 'Sueca' },
 ];
 
@@ -105,7 +105,7 @@ export function IntroScreen({
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const helpButtonRef = useRef<HTMLButtonElement>(null);
   const [selections, setSelections] = useState<StartupSelections>(() =>
-    persistanceEngine.load(PERSISTENCE_SECTION_STARTUP, isStartupSelections) ?? DEFAULT_SELECTIONS,
+    persistanceEngine.load(PERSISTENCE_GAME_MODE, isStartupSelections) ?? DEFAULT_SELECTIONS,
   );
   const selectionsRef = useRef(selections);
   const { gameMode, difficulty, matchCount } = selections;
@@ -113,7 +113,7 @@ export function IntroScreen({
   const updateSelections = (change: Partial<StartupSelections>) => {
     const next = { ...selectionsRef.current, ...change };
     selectionsRef.current = next;
-    persistanceEngine.save(PERSISTENCE_SECTION_STARTUP, next);
+    persistanceEngine.save(PERSISTENCE_GAME_MODE, next);
     setSelections(next);
   };
 
