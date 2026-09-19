@@ -1,5 +1,7 @@
 {
   "label": "Public Domain",
   "description": "The traditional & public domain deck",
-  "backs": 4
+  "backs": 4,
+  "width": 1500,
+  "height": 2100
 }

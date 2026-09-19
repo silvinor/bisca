@@ -1,5 +1,7 @@
 {
   "label": "Swiss",
   "description": "A Swiss themed deck",
-  "backs": 2
+  "backs": 2,
+  "width": 250,
+  "height": 390
 }

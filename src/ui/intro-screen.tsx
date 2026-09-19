@@ -9,7 +9,7 @@ import {
   PERSISTENCE_GAME_MODE,
 } from '../core/constants';
 import { i18n } from '../core/i18n';
-import { persistanceEngine } from '../core/persistance-engine';
+import { persistenceEngine } from '../core/persistence-engine';
 import { RadioButtons, type RadioButtonOption } from './radio-buttons';
 import { RadioImages } from './radio-images';
 
@@ -105,7 +105,7 @@ export function IntroScreen({
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const helpButtonRef = useRef<HTMLButtonElement>(null);
   const [selections, setSelections] = useState<StartupSelections>(() =>
-    persistanceEngine.load(PERSISTENCE_GAME_MODE, isStartupSelections) ?? DEFAULT_SELECTIONS,
+    persistenceEngine.load(PERSISTENCE_GAME_MODE, isStartupSelections) ?? DEFAULT_SELECTIONS,
   );
   const selectionsRef = useRef(selections);
   const { gameMode, difficulty, matchCount } = selections;
@@ -113,7 +113,7 @@ export function IntroScreen({
   const updateSelections = (change: Partial<StartupSelections>) => {
     const next = { ...selectionsRef.current, ...change };
     selectionsRef.current = next;
-    persistanceEngine.save(PERSISTENCE_GAME_MODE, next);
+    persistenceEngine.save(PERSISTENCE_GAME_MODE, next);
     setSelections(next);
   };
 

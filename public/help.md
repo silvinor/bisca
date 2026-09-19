@@ -14,7 +14,9 @@ The game is played by 2, 3, or 4 players depending on [game mode](#game_mode). I
 
 The game is played anticlockwise.
 
-The first dealer is chosen by draw of the high Joker [^2], and the turn to deal passes to the right after each hand. The dealer shuffles the cards and the player at the dealer's left cuts. The dealer then gives 3 cards (or more depending on [game mode](#game_mode)) to each player, one card at a time, beginning with the player to dealer's right, going around anticlockwise and ending with the dealer. The next card is then turned face up, and its suit becomes trumps (called *trunfo*). It is then placed at the bottom of the deck, partially visible.
+The deck is first shuffled [^2] and then fanned (or picked from the wash), with each player selecting a card. The player who draws the highest-value card becomes the first dealer. If two or more players draw cards of the same highest value, those players draw again until a single highest card is drawn. The turn to deal passes to the right after each hand.
+
+The dealer then gives 3 cards (or more depending on [game mode](#game_mode)) to each player, one card at a time, beginning with the player to dealer's right, going around anticlockwise and ending with the dealer. The next card is then turned face up, and its suit becomes trumps (called *trunfo*). It is then placed at the bottom of the deck, partially visible.
 
 In the Sueca game mode the card top of the split deck becomes the trump card, and is placed face up on the dealers side - the dealer keeps the remaining 9 cards to themselves and may plat the trump card at any time.
 
@@ -129,7 +131,7 @@ Four-player Bisca was played in Portugal in the 20th century, and a four-player 
 
 [^1]: When the Italian and Spanish cards are mapped onto the French deck, the Jack outranks the Queen. The Jack's picture most resembles the Knight, while the Queen is matched to the Knave, which in the old Portuguese decks (the *sotas*) was always shown as a woman. This can confuse players who are used to the Queen outranking the Jack.
 
-[^2]: Most packs include two Jokers, a practice that became standard in the late 1940s for the game of Canasta. The two are often printed differently: one in full colour and one in a single colour, or one red and one black. Where the Jokers need to be ranked, the full-colour or red Joker is usually the "high" Joker and outranks the other. Some packs print both Jokers the same, and German and Austrian packs have included three since the 1950s. In this app's decks, the high Joker is the more detailed of the two, though this varies from deck to deck.
+[^2]: This is usually done with a *wash shuffle*. The cards are spread face down on the table and mixed around with both hands in a circular or random motion before being gathered back into a deck. It’s also sometimes called *"washing the cards"* or a *scramble shuffle*.
 
 [^3]: A *trick* is one round of play in which each player plays one card.
 

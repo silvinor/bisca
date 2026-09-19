@@ -1,5 +1,7 @@
 {
   "label": "Large",
   "description": "Based on the public domain deck, with larger face details",
-  "backs": 2
+  "backs": 2,
+  "width": 500,
+  "height": 726
 }

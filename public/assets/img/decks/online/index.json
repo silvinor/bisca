@@ -1,5 +1,7 @@
 {
   "label": "Online",
   "description": "Popular online deck, ideal for mobile game play",
-  "backs": 3
+  "backs": 3,
+  "width": 127,
+  "height": 177
 }

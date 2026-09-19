@@ -34,7 +34,7 @@ import {
   transitionScreenState,
   type ScreenState,
 } from './core/screen-state-engine'
-import { persistanceEngine } from './core/persistance-engine'
+import { persistenceEngine } from './core/persistence-engine'
 import { i18n } from './core/i18n'
 import { Table } from './ui/table'
 import { IntroScreen } from './ui/intro-screen'
@@ -100,7 +100,7 @@ const isStoredSettings = (value: unknown): value is StoredSettings => {
 }
 
 function loadSettings(): PersistedSettings {
-  const stored = persistanceEngine.load(PERSISTENCE_SETTINGS, isStoredSettings)
+  const stored = persistenceEngine.load(PERSISTENCE_SETTINGS, isStoredSettings)
   if (stored) {
     const normalized: PersistedSettings = {
       gameDeck: stored.gameDeck,
@@ -119,15 +119,15 @@ function loadSettings(): PersistedSettings {
       || stored.courtCardPoints === undefined
       || stored.scoreKeeping === undefined
     ) {
-      persistanceEngine.save(PERSISTENCE_SETTINGS, normalized)
+      persistenceEngine.save(PERSISTENCE_SETTINGS, normalized)
     }
-    persistanceEngine.clearLegacy(LEGACY_PERSISTENCE_SECTIONS)
+    persistenceEngine.clearLegacy(LEGACY_PERSISTENCE_SECTIONS)
     return normalized
   }
 
-  const gameDeck = persistanceEngine.loadLegacy('game-deck', isDeckId) ?? DEFAULT_GAME_DECK
-  const cardBacks = persistanceEngine.loadLegacy('card-backs', isCardBackSelections) ?? {}
-  const formerCardBack = persistanceEngine.loadLegacy('card-back', isCardBack)
+  const gameDeck = persistenceEngine.loadLegacy('game-deck', isDeckId) ?? DEFAULT_GAME_DECK
+  const cardBacks = persistenceEngine.loadLegacy('card-backs', isCardBackSelections) ?? {}
+  const formerCardBack = persistenceEngine.loadLegacy('card-back', isCardBack)
   const migrated = {
     gameDeck,
     cardBacks: formerCardBack && !cardBacks[gameDeck]
@@ -139,8 +139,8 @@ function loadSettings(): PersistedSettings {
     courtCardPoints: DEFAULT_COURT_CARD_POINTS,
     scoreKeeping: DEFAULT_SCORE_KEEPING,
   }
-  persistanceEngine.save(PERSISTENCE_SETTINGS, migrated)
-  persistanceEngine.clearLegacy(LEGACY_PERSISTENCE_SECTIONS)
+  persistenceEngine.save(PERSISTENCE_SETTINGS, migrated)
+  persistenceEngine.clearLegacy(LEGACY_PERSISTENCE_SECTIONS)
   return migrated
 }
 
@@ -154,23 +154,23 @@ const hasSettingsVisibility = (value: unknown): value is LegacySettingsVisibilit
 }
 
 function loadScreenState(): ScreenState {
-  const stored = persistanceEngine.load(PERSISTENCE_SCREEN_STATE, isScreenState)
+  const stored = persistenceEngine.load(PERSISTENCE_SCREEN_STATE, isScreenState)
   if (stored) {
     if (stored.screen === GameScreen.INTRO) {
-      persistanceEngine.save(PERSISTENCE_SCREEN_STATE, INITIAL_SCREEN_STATE)
+      persistenceEngine.save(PERSISTENCE_SCREEN_STATE, INITIAL_SCREEN_STATE)
       return INITIAL_SCREEN_STATE
     }
     return stored
   }
 
-  const formerSettings = persistanceEngine.load(PERSISTENCE_SETTINGS, hasSettingsVisibility)
+  const formerSettings = persistenceEngine.load(PERSISTENCE_SETTINGS, hasSettingsVisibility)
   const formerSettingsOpen = formerSettings?.open
-    ?? persistanceEngine.loadLegacy('settings-screen', isBoolean)
+    ?? persistenceEngine.loadLegacy('settings-screen', isBoolean)
     ?? false
   const initial = formerSettingsOpen
     ? { screen: GameScreen.SETTINGS }
     : INITIAL_SCREEN_STATE
-  persistanceEngine.save(PERSISTENCE_SCREEN_STATE, initial)
+  persistenceEngine.save(PERSISTENCE_SCREEN_STATE, initial)
   return initial
 }
 
@@ -220,7 +220,7 @@ export function App() {
   const transition = (action: ScreenStateAction) => {
     setScreenState((current) => {
       const next = transitionScreenState(current, action)
-      if (next !== current) persistanceEngine.save(PERSISTENCE_SCREEN_STATE, next)
+      if (next !== current) persistenceEngine.save(PERSISTENCE_SCREEN_STATE, next)
       return next
     })
   }
@@ -228,7 +228,7 @@ export function App() {
   const updateSettings = (update: (current: PersistedSettings) => PersistedSettings) => {
     setSettings((current) => {
       const next = update(current)
-      persistanceEngine.save(PERSISTENCE_SETTINGS, next)
+      persistenceEngine.save(PERSISTENCE_SETTINGS, next)
       return next
     })
   }

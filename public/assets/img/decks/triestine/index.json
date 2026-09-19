@@ -1,5 +1,7 @@
 {
   "label": "Triestine",
   "description": "Italian Triestine regional deck",
-  "backs": 1
+  "backs": 1,
+  "width": 210,
+  "height": 390
 }

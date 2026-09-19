@@ -1,5 +1,7 @@
 {
   "label": "Napoletane",
   "description": "Italian Napoletane regional deck",
-  "backs": 3
+  "backs": 3,
+  "width": 331,
+  "height": 547
 }

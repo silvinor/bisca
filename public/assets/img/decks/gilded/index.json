@@ -1,5 +1,7 @@
 {
   "label": "Gilded",
   "description": "The Gilded deck, by @DataJuggler",
-  "backs": 4
+  "backs": 4,
+  "width": 400,
+  "height": 560
 }

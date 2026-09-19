@@ -1,5 +1,7 @@
 {
   "label": "Spanish",
   "description": "Common Spanish deck",
-  "backs": 4
+  "backs": 4,
+  "width": 253,
+  "height": 378
 }

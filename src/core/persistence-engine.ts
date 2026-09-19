@@ -72,4 +72,4 @@ export class PersistanceEngine {
   }
 }
 
-export const persistanceEngine = new PersistanceEngine();
+export const persistenceEngine = new PersistanceEngine();
