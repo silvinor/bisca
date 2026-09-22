@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "Bisca",
+    "slug": "bisca",
+    "version": "0.0.0",
+    "orientation": "landscape",
+    "icon": "./public/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.bisca"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#009966",
+        "foregroundImage": "./public/android-icon-foreground.png",
+        "__backgroundImage": "./public/android-icon-background.png",
+        "monochromeImage": "./public/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./public/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./public/splash-light.png",
+          "imageWidth": 256,
+          "resizeMode": "contain",
+          "backgroundColor": "#009966",
+          "dark": {
+            "image": "./public/splash-dark.png",
+            "backgroundColor": "#009966"
+          }
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "enableSceneSupport": true
+          }
+        }
+      ]
+    ]
+  }
+}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2026 @SilvinoR
+SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+-->
+<html lang="%LANG_ISO_CODE%">
+<head>
+  <meta charset="utf-8" />
+  <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+  <title>%WEB_TITLE%</title>
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="icon" href="favicon.gif">
+  <style id="expo-reset">
+    /* Expo (https://necolas.github.io/react-native-web/docs/setup/#root-element) */
+    html, body { height: 100%; }
+    body { overflow: hidden; }
+    #root { display: flex; height: 100%; flex: 1; }
+  </style>
+  <style id="anti-fouc">
+    /* Anti "Flash Of Unstyled Content" */
+    :root { color-scheme: light dark; }
+    html, body { background: #fafafa; color: #111; }
+    @media (prefers-color-scheme: dark) {
+      html, body { background: #1f1f1f; color: #eee; }
+    }
+  </style>
+</head>
+<body>
+  <noscript> This app requires JavaScript. </noscript>
+  <div id="root"></div>
+  <script id="auto-dark-mode">
+    (function() {
+      const media = window.matchMedia('(prefers-color-scheme: dark)');
+      const setTheme = (dark) => {
+        document.documentElement.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
+        document.body.classList.toggle('dark', dark);
+        document.body.classList.toggle('light', !dark);
+      };
+      setTheme(media.matches);
+      media.addEventListener('change', (e) => setTheme(e.matches));
+    })();
+  </script>
+</body>
+</html>

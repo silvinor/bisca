@@ -1,31 +1,50 @@
 {
-  "name": "bisca-app",
-  "private": true,
+  "name": "bisca",
   "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "node scripts/version.js && vite",
-    "build": "node scripts/version.js && tsc -b && vite build",
-    "preview": "vite preview"
-  },
+  "main": "src/index.ts",
   "dependencies": {
-    "@preact/signals": "^2.11.2",
-    "markdown-it": "^15.0.2",
-    "markdown-it-anchor": "^10.0.0",
-    "markdown-it-attrs": "^5.0.1",
-    "markdown-it-footnote": "^4.0.0",
-    "preact": "^10.29.8"
+    "@fortawesome/fontawesome-svg-core": "^7.3.1",
+    "@fortawesome/free-solid-svg-icons": "^7.3.1",
+    "@fortawesome/react-native-fontawesome": "^1.0.0",
+    "boardgame.io": "^0.50.2",
+    "expo": "~57.0.24",
+    "expo-build-properties": "~57.0.21",
+    "expo-splash-screen": "~57.0.9",
+    "expo-status-bar": "~57.0.1",
+    "expo-system-ui": "~57.0.4",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-svg": "15.15.4",
+    "react-native-web": "^0.21.2"
   },
   "devDependencies": {
-    "@preact/preset-vite": "^2.10.6",
-    "@types/node": "^26.6.2",
-    "animejs": "4.5.0",
-    "bootstrap": "5.3.8",
-    "sass": "^1.78.0",
-    "typescript": "~7.0.2",
-    "vite": "^8.3.0"
+    "@types/react": "~19.2.2",
+    "npm-run-all2": "^9.0.3",
+    "sass": "^1.104.1",
+    "sharp": "^0.35.4",
+    "typescript": "~6.0.3"
   },
+  "scripts": {
+    "start": "run-s prebuild start:*",
+    "start:1": "expo start",
+    "dev": "run-s prebuild dev:*",
+    "dev:1": "expo start --dev-client",
+    "android": "run-s prebuild android:*",
+    "android:1": "expo start --android",
+    "ios": "run-s prebuild ios:*",
+    "ios:1": "expo start --ios",
+    "web": "run-s prebuild web:*",
+    "web:1": "expo start --web",
+    "build": "run-s build:*",
+    "build:1": "rm -rf dist",
+    "build:2": "expo export --platform web",
+    "prebuild": "run-s prebuild:*",
+    "prebuild:1": "node scripts/gen-icons.js",
+    "prebuild:2": "node scripts/gen-version.js"
+  },
+  "private": true,
   "allowScripts": {
-    "fsevents@2.3.3": true
+    "@parcel/watcher@2.6.0": true
   }
 }
