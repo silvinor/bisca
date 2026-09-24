@@ -1,3 +1,14 @@
 {
-  "appName": "Bisca"
+  "appName": "Bisca",
+  "app:close": "Close",
+  "app:settings": "Settings",
+  "app:quit": "Quit",
+  "app:help": "Help",
+  "main:startupError": "Unable to load application resources.",
+  "state-game-mode:game-mode": "Game mode",
+  "state-game-mode:mode1": "Three's Bisca",
+  "state-game-mode:mode2": "Seven's Bisca",
+  "state-game-mode:mode3": "Nine's Bisca",
+  "state-game-mode:mode4": "Three-player Bisca",
+  "state-game-mode:mode5": "Sueca"
 }

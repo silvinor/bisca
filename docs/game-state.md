@@ -4,6 +4,11 @@ Nested **state engines** used.  The main loop is the main game state.  This is a
 
 Within each file there is it's own *mini* state engine.  Each node therein is a separate function.
 
+The application runs the main engine in a cooperative asynchronous loop. Each
+`tick()` either returns immediately when its state can progress, or awaits the
+event that allows a waiting state to continue. This keeps the browser responsive
+without polling or tying game progression to display animation frames.
+
 ## Main State Engine
 
 ```mermaid
@@ -193,23 +198,23 @@ classDiagram
         #State currentState
         -boolean running
         +start() void
-        +step() State
+        +step() Promise~State~
         +render() void
-        +frame() void
+        +frame() Promise~void~
         +stop() void
         +State state
         +boolean finished
         #init() void
-        #tick(lastState: State) State
+        #tick(lastState: State) State | Promise~State~
         #draw(currentState: State) void
         #end() void
     }
     class MainGameEngine {
-        -MainState returnTo
-        -OverlayState requestedOverlay
-        +openOverlay(overlay: OverlayState) void
+        -StateMain returnTo
+        -StateOverlay requestedOverlay
+        +openOverlay(overlay: StateOverlay) void
         +closeOverlay() void
-        -nextState(state: MainState) MainState
+        -nextState(state: StateMain) StateMain
     }
     class OverlayScreen {
         +show() void
@@ -224,15 +229,15 @@ classDiagram
     class SettingsScreen
     class HelpScreen
 
-    GameState --|> MainGameEngine
-    GameState --|> InitGameState
-    GameState --|> SplashGameState
-    GameState --|> GameModeGameState
-    GameState --|> SelectDealerGameState
-    GameState --|> PlayGameState
-    GameState --|> WinLoseGameState
-    OverlayScreen --|> SettingsScreen
-    OverlayScreen --|> HelpScreen
+    GameState --|> MainGameEngine : inherits
+    GameState --|> InitGameState : inherits
+    GameState --|> SplashGameState : inherits
+    GameState --|> GameModeGameState : inherits
+    GameState --|> SelectDealerGameState : inherits
+    GameState --|> PlayGameState : inherits
+    GameState --|> WinLoseGameState : inherits
+    OverlayScreen --|> SettingsScreen : inherits
+    OverlayScreen --|> HelpScreen : inherits
 
     MainGameEngine --> InitGameState : runs
     MainGameEngine --> SplashGameState : runs
@@ -244,44 +249,24 @@ classDiagram
     MainGameEngine --> HelpScreen : displays
 ```
 
-
-<!--
-## Update this ↓ later
+## Interfaces & Enums
 
 ```mermaid
 classDiagram
-    namespace Engine_Core {
-        class EngineCore["engine_core"] {
-            -GameState_t* current_state
-            -bool debug_overlay_enabled
-            -GameState_t* game_states
-            +main() void
-            +switch_state(GameStates_e next_state) void
-            +draw_debug_overlay() void
-        }
-
-        class Keyboard["keyboard"]
-
-        class GameStates_e {
-            <<enumeration>>
-            GAME_STATE_REMAIN = -1
-            GAME_STATE_TITLE
-            GAME_STATE_PLAY
-            GAME_STATE_GAMEOVER
-            GAME_STATE_COUNT
-        }
-
-        class GameState_t {
-            <<struct>>
-            +init() void
-            +update() GameStates_e
-            +draw() void
-            +shutdown() void
-        }
+    class StateMain {
+        <<enumeration>>
+        INIT
+        SPLASH
+        GAME_MODE
+        PLAY
+        SELECT_DEALER
+        PLAY
+        WIN_LOSE
     }
 
-    EngineCore ..> Keyboard : reads input from
-    EngineCore ..> GameStates_e : selects
-    EngineCore ..> GameState_t : manages
+    class StateOverlay {
+        <<enumeration>>
+        SETTINGS
+        HELP
+    }
 ```
--->

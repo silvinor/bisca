@@ -16,6 +16,12 @@
   "animejs": {
     "js": "https://cdn.jsdelivr.net/npm/animejs@4.5.0/dist/bundles/anime.umd.min.js"
   },
+  "boardgameio": {
+    "js": "https://cdnjs.cloudflare.com/ajax/libs/boardgame-io/0.50.2/boardgameio.min.js"
+  },
+  "fonts": {
+    "css": "/assets/fnt/Excalifont.css"
+  },
   "favicon": {
     "svg": "favicon.svg"
   }

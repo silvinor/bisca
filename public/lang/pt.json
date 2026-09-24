@@ -1,3 +1,14 @@
 {
-  "appName": "Bisca"
+  "appName": "Bisca",
+  "app:close": "Fechar",
+  "app:settings": "Opções",
+  "app:quit": "Desistir",
+  "app:help": "Ajuda",
+  "main:startupError": "A aplicação não conseguiu carregar os recursos necessários.",
+  "state-game-mode:game-mode": "Modo de jogo",
+  "state-game-mode:mode1": "Bisca dos Três",
+  "state-game-mode:mode2": "Bisca dos Sete",
+  "state-game-mode:mode3": "Bisca dos Nove",
+  "state-game-mode:mode4": "Bisca para três jogadores",
+  "state-game-mode:mode5": "Sueca"
 }
