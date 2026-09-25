@@ -1,7 +1,7 @@
 // Copyright (c) 2026 @SilvinoR
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-import { StateMain } from '../types/game-state';
+import { StateMain } from '../types/game-state.d';
 import { GameState } from './game-state';
 import { logger } from './logger';
 
@@ -18,8 +18,7 @@ export class InitGameState extends GameState<StateMain> {
 
   protected tick(): StateMain {
     logger.debug('INIT --> Tick');
-  
-    this.stop();
+
     return StateMain.SPLASH; // move on to next state
   }
 

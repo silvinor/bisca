@@ -10,5 +10,15 @@
   "state-game-mode:mode2": "Bisca dos Sete",
   "state-game-mode:mode3": "Bisca dos Nove",
   "state-game-mode:mode4": "Bisca para três jogadores",
-  "state-game-mode:mode5": "Sueca"
+  "state-game-mode:mode5": "Sueca",
+  "state-game-mode:difficulty": "Dificuldade",
+  "state-game-mode:difficulty-easy": "Fácil",
+  "state-game-mode:difficulty-normal": "Normal",
+  "state-game-mode:difficulty-hard": "Difícil",
+  "state-game-mode:match-count": "Número de partidas",
+  "state-game-mode:match-count-one": "Jogo\núnico",
+  "state-game-mode:match-count-two": "Uma\npartida",
+  "state-game-mode:match-count-three": "Melhor de\ntrês",
+  "state-game-mode:match-count-four": "Primeiro a\nquatro",
+  "state-game-mode:start": "Começar"
 }

@@ -1,7 +1,7 @@
 // Copyright (c) 2026 @SilvinoR
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-import { StateMain } from '../types/game-state';
+import { StateMain } from '../types/game-state.d';
 import { GameState } from './game-state';
 import { GameModeGameState } from './state-game-mode';
 import { HelpScreen } from './state-help';
@@ -28,7 +28,7 @@ export class MainGameEngine extends GameState<StateMain> {
   // private overlayClosed: Promise<void> | null = null;
   // private resolveOverlayClosed: (() => void) | null = null;
   private readonly stateListeners = new Set<StateListener>();
-  private activeNode: MainGameNode | null = null;
+  private currentNode: MainGameNode | null = null;
   private readonly savedNodes: MainGameNode[] = [];
   
   public constructor(
@@ -41,6 +41,10 @@ export class MainGameEngine extends GameState<StateMain> {
     return this.state;
   }
 
+  public get activeNode(): MainGameNode | null {
+    return this.currentNode;
+  }
+
   public subscribe(listener: StateListener): () => void {
     this.stateListeners.add(listener);
     listener(this.activeState);
@@ -51,74 +55,93 @@ export class MainGameEngine extends GameState<StateMain> {
 
   public override async frame(): Promise<void> {
     const preFrameState = this.activeState;
-    await super.frame();
+    await this.step();
     if (this.activeState !== preFrameState) this.notifyStateListeners();
   }
 
+  // The main loop delegates its whole "tick" to the active node: node.step()
+  // already runs that node's full tick -> draw -> wait cycle until it
+  // transitions, so there is no separate draw/wait phase to run here.
   public override async step(): Promise<StateMain> {
     if (this.finished) return this.currentState;
     this.currentState = await this.tick(this.currentState);
     return this.currentState;
   }
 
+  /**
+   * Settings and Help can be opened at any time, from any node. Push the
+   * current node onto the FILO stack (so Settings and Help can open each
+   * other and unwind correctly) and switch to the requested overlay.
+   */
   public openOverlay(overlay: StateMain): void {
     logger.debug(`openOverlay(${overlay})`);
 
-    if (this.activeNode) this.savedNodes.push(this.activeNode);
-    this.activeNode?.stop();
-    this.activeNode = null;
-    this.currentState = overlay;
+    if (this.currentNode) this.savedNodes.push(this.currentNode);
     this.activateNode(overlay);
-    this.notifyStateListeners();
-  }
-
-  public closeOverlay(): void {
-    const savedNode = this.savedNodes.pop();
-    if (!savedNode) return;
-
-    this.activeNode?.stop();
-    this.activeNode = savedNode;
-    this.currentState = savedNode.state;
-    savedNode.start();
     this.notifyStateListeners();
   }
 
   protected init(): void {
     // A new run begins at INIT; its node decides what persisted game to restore.
-    this.currentState = StateMain.INIT;
     this.activateNode(StateMain.INIT);
   }
 
   protected async tick(lastState: StateMain): Promise<StateMain> {
-    // Advance the current node until it reports completion, then start its successor.
-    const node = this.activeNode;
+    // node.step() suspends until the active node is ready to progress, so its
+    // resolution always means "advance" — start the successor it names.
+    const node = this.currentNode;
     if (!node) return lastState;
-    
+
     const wantedState = await node.step();
-    if (node !== this.activeNode) return this.currentState;
-    if (!node.finished) return lastState;
-    
-    this.activateNode(wantedState);
-    return wantedState;
+    // The node may have been swapped out (e.g. an overlay opened over it)
+    // while its step() was pending; a stale result must not resurrect it.
+    if (node !== this.currentNode) return this.currentState;
+
+    return this.activateNode(wantedState);
   }
 
   protected draw(): void {
-    this.activeNode?.render();
+    // Not reached in the normal loop: step() is overridden above and never
+    // calls render() on this engine itself. Each node draws itself as part
+    // of its own step() cycle. Kept for interface completeness.
+    this.currentNode?.render();
   }
 
   protected end(): void {
-    this.activeNode?.stop();
-    this.activeNode = null;
+    this.currentNode?.stop();
+    this.currentNode = null;
     this.savedNodes.forEach((node) => node.stop());
     this.savedNodes.length = 0;
   }
 
-  private activateNode(state: StateMain): void {
-    this.activeNode?.stop();
+  /**
+   * Stops whatever is current and switches to `state`. StateMain.RESUME is
+   * not a real screen: it means "pop the FILO stack and continue whichever
+   * node Settings or Help interrupted." Returns the state actually reached,
+   * since resuming reveals a different StateMain than the literal `state`
+   * argument.
+   */
+  private activateNode(state: StateMain): StateMain {
+    this.currentNode?.stop();
+
+    if (state === StateMain.RESUME) {
+      const resumed = this.savedNodes.pop();
+      if (resumed) {
+        this.currentNode = resumed;
+        resumed.start();
+        this.currentState = resumed.state;
+        return this.currentState;
+      }
+      // Nothing left to resume (should not happen): fall back to the menu
+      // rather than leaving the engine with no active node.
+      return this.activateNode(StateMain.GAME_MODE);
+    }
 
     const factory = this.nodeFactories[state];
-    this.activeNode = factory?.() ?? null;
-    this.activeNode?.start();
+    this.currentNode = factory?.() ?? null;
+    this.currentNode?.start();
+    this.currentState = state;
+    return state;
   }
 
   private notifyStateListeners(): void {

@@ -14,7 +14,7 @@ import {
   APP_BUILD,
   APP_URL,
 } from './core/version';
-import { StateMain } from './types/game-state';
+import { StateMain } from './types/game-state.d';
 import { NavButton } from './ui/nav-button';
 import {
   closeClick,
@@ -42,15 +42,15 @@ function renderNavButtons(state: ActiveGameState) {
     <>
       {buttons.includes('s') && (
         <NavButton
-          bs_class='btn-outline-info'
-          fa_inner='⚙'
+          bs_class='btn-outline-primary'
+          fa_inner='&#x2699;'
           text={i18n.t('app:settings')}
           onClick={settingsClick}
         />
       )}
       {buttons.includes('h') && (
         <NavButton
-          bs_class='btn-outline-success'
+          bs_class='btn-outline-info'
           fa_inner='?'
           text={i18n.t('app:help')}
           onClick={helpClick}
@@ -59,7 +59,7 @@ function renderNavButtons(state: ActiveGameState) {
       {buttons.includes('c') && (
         <NavButton
           bs_class='btn-outline-danger'
-          fa_inner='×'
+          fa_inner='&#x00D7;'
           text={i18n.t('app:close')}
           onClick={closeClick}
         />
@@ -67,7 +67,7 @@ function renderNavButtons(state: ActiveGameState) {
       {buttons.includes('q') && (
         <NavButton
           bs_class='btn-outline-secondary'
-          fa_inner='×'
+          fa_inner='&#x00D7;'
           text={i18n.t('app:quit')}
           onClick={quitClick}
         />

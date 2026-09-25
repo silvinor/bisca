@@ -49,6 +49,24 @@
   flex-wrap: wrap;
   gap: .5rem;
 
+  .radio-images-bg {
+    rect {
+      fill: #096;
+    }
+  }
+
+  .radio-images-tx {
+    background: url('/assets/img/table/felt.png') repeat;
+  }
+
+  .selected .radio-images-ov {
+    background-color: #fff3;
+  }
+
+  .unselected .radio-images-ov {
+    background-color: #0003;
+  }
+
   .radio-images-item {
     display: block;
   }

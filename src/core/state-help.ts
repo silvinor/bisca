@@ -3,7 +3,7 @@
 
 import { GameState } from './game-state';
 import { logger } from './logger';
-import { StateMain } from '../types/game-state';
+import { StateMain } from '../types/game-state.d';
 
 export class HelpScreen extends GameState<StateMain> {
   public constructor() {
@@ -16,7 +16,9 @@ export class HelpScreen extends GameState<StateMain> {
 
   protected tick(lastState: StateMain): StateMain {
     logger.debug('Tick --> HELP');
-    return lastState;
+    // reactions.ts's closeClick() calls trigger() on this node; once fired,
+    // resume whichever node this overlay interrupted.
+    return this.triggered ? StateMain.RESUME : lastState;
   }
 
   protected draw(): void {

@@ -1,7 +1,7 @@
 // Copyright (c) 2026 @SilvinoR
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-import { StateMain } from '../types/game-state';
+import { StateMain } from '../types/game-state.d';
 import { GameState } from './game-state';
 import { logger } from './logger'
 
@@ -17,7 +17,6 @@ export class SplashGameState extends GameState<StateMain> {
   protected tick(): StateMain {
     logger.debug('SPLASH --> Tick');
 
-    this.stop();
     return StateMain.GAME_MODE; // move on to next state
   }
 

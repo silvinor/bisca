@@ -10,5 +10,15 @@
   "state-game-mode:mode2": "Seven's Bisca",
   "state-game-mode:mode3": "Nine's Bisca",
   "state-game-mode:mode4": "Three-player Bisca",
-  "state-game-mode:mode5": "Sueca"
+  "state-game-mode:mode5": "Sueca",
+  "state-game-mode:difficulty": "Difficulty",
+  "state-game-mode:difficulty-easy": "Easy",
+  "state-game-mode:difficulty-normal": "Normal",
+  "state-game-mode:difficulty-hard": "Hard",
+  "state-game-mode:match-count": "Match count",
+  "state-game-mode:match-count-one": "Single\nGame",
+  "state-game-mode:match-count-two": "One\nSet",
+  "state-game-mode:match-count-three": "Best of\nThree",
+  "state-game-mode:match-count-four": "First to\nFour",
+  "state-game-mode:start": "Start"
 }

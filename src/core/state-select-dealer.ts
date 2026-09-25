@@ -3,7 +3,7 @@
 
 import { GameState } from './game-state';
 import { logger } from './logger';
-import { StateMain } from '../types/game-state';
+import { StateMain } from '../types/game-state.d';
 
 export class SelectDealerGameState extends GameState<StateMain> {
   public constructor() {
@@ -16,6 +16,7 @@ export class SelectDealerGameState extends GameState<StateMain> {
 
   protected tick(lastState: StateMain): StateMain {
     logger.debug('Tick --> SELECT_DEALER');
+    // TODO: transition once this node has a real trigger to react to.
     return lastState;
   }
 

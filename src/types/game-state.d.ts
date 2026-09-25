@@ -17,3 +17,12 @@ export enum StateMain {
   // used by Overlay states to resume prior states
   RESUME = 'resume'
 }
+
+/** Game mode choices offered on the GAME_MODE screen. */
+export type GameMode = 'mode1' | 'mode2' | 'mode3' | 'mode4' | 'mode5';
+
+/** Computer difficulty choices offered on the GAME_MODE screen. */
+export type Difficulty = 'easy' | 'normal' | 'hard';
+
+/** Match length choices offered on the GAME_MODE screen. */
+export type MatchCount = 'one' | 'two' | 'three' | 'four';
