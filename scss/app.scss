@@ -18,15 +18,19 @@
 .debug {
 
   #app {
-     background-color: #096;
+    // background-color: #096;
   }
 
   .d {
-    outline: 1px dotted red;
+    // outline: 1px dotted red;
   }
 
   // header { outline: 1px dashed red; }
-  main { outline: 1px dashed green; border: 1px dashed green; }
+  main { 
+    // outline: 1px dashed green; 
+    // border: 1px dashed green;
+  }
+
   // footer { outline: 1px dashed blue; }
 }
 
@@ -42,6 +46,31 @@
   border-color: transparent !important;
 }
 
+$table-green: #096;
+$table-red: #C50;
+$table-blue: #069;
+$table-ebony: #555;
+$table-purple: #A7C;
+
+.bg-green { background-color: $table-green; }
+.bg-red { background-color: $table-red; }
+.bg-blue { background-color: $table-blue; }
+.bg-ebony { background-color: $table-ebony; }
+.bg-purple { background-color: $table-purple; }
+
+.bg-felt { background-image: url('/assets/img/table/felt.png'); }
+.bg-fabric { background-image: url('/assets/img/table/fabric.png'); }
+.bg-leather { background-image: url('/assets/img/table/leather.png'); }
+.bg-suede { background-image: url('/assets/img/table/suede.png'); }
+.bg-digital { background-image: url('/assets/img/table/digital.png'); }
+.bg-felt, 
+.bg-fabric,
+.bg-leather,
+.bg-suede,
+.bg-digital { 
+  background-repeat: repeat;
+}
+
 // ---------- Radio Images ----------
 
 .radio-images {
@@ -51,12 +80,17 @@
 
   .radio-images-bg {
     rect {
-      fill: #096;
+      // fill: #096;
     }
-  }
 
-  .radio-images-tx {
-    background: url('/assets/img/table/felt.png') repeat;
+    // Table Color swatches (state-settings.tsx): option.classes[0] selects
+    // one. Nested here (not a bare top-level rule) so the compound selector
+    // outranks the unconditional fill above regardless of source order.
+    // &.bg-green rect { fill: $table-green; }
+    // &.bg-red rect { fill: transparent; }
+    // &.bg-blue rect { fill: $table-blue; }
+    // &.bg-ebony rect { fill: $table-ebony; }
+    // &.bg-purple rect { fill: $table-purple; }
   }
 
   .selected .radio-images-ov {
@@ -97,6 +131,19 @@
     }
   }
 
+  .radio-images-button-half {
+    height: 2.5rem;
+
+    svg {
+      height: 50%;
+
+      rect {
+        height: 128px;
+      }
+    }
+        
+  }
+
   .btn-check:checked + .radio-images-button {
     border-width: .25rem;
     // border-color: var(--bs-primary);
@@ -122,7 +169,38 @@
   }
 }
 
-// The Preact host owns the runtime-configurable table background.
+
+// ---------- App visual space ----------
+//  Preact host owns the runtime-configurable table background.
+
+#app-header,
+#app-footer {
+  z-index: 2;
+  background-color: #FFF2;
+}
+
+// #app-main {
+//   // Flex children default to min-height: auto, which lets content push the
+//   // whole page taller instead of scrolling inside this element.
+ // }
+
+.app-fieldset:not(:last-child) {
+  border-bottom: $frame-width solid $frame-color-l;
+}
+
+
+@include color-scheme(dark) {
+
+  #app-header,
+  #app-footer {
+    background-color: #0003;
+  }
+
+  .app-fieldset:not(:last-child) {
+    border-bottom-color: $frame-color-d;
+  }
+}
+
 
 // #app {
 //   position: fixed;
@@ -132,11 +210,6 @@
 //   overflow: hidden;
 // }
 
-// .app-header,
-// .app-footer {
-//   position: sticky;
-//   z-index: 2;
-// }
 
 // .app-header {
 //   top: 0;
@@ -390,7 +463,7 @@
 // .welcome-ambigram {
 //   display: block;
 //   height: auto;
-//   filter: drop-shadow(0 1.25rem 1rem rgba($black, .65));
+//   filter: drop-shadow(0 1.25rem 1rem rgba($ebony, .65));
 //   will-change: transform;
 // }
 
@@ -400,10 +473,9 @@
 //   max-width: 28rem;
 // }
 
-// .settings-modal-body,
-// .help-modal-body {
-//   min-height: min(60vh, 36rem);
-// }
+.help-modal-body {
+  min-height: min(60vh, 36rem);
+}
 
 // .w20 {
 //   width: 20%;
@@ -526,65 +598,62 @@
 //     var(--bs-focus-ring-width) var(--bs-focus-ring-color);
 // }
 
-// .help-modal-body {
+.help-modal-body {
 
-//   .help-card-face {
-//     > img {
-//       // Same border as Bootstrap's .card, plus a small shadow
-//       border: var(--#{$prefix}border-width) solid var(--#{$prefix}border-color-translucent);
-//       border-radius: var(--#{$prefix}border-radius);
-//       box-shadow: var(--#{$prefix}box-shadow-sm);
-//     }
-//   }
+  .help-card-face {
+    > img {
+      // Same border as Bootstrap's .card, plus a small shadow
+      border: var(--#{$prefix}border-width) solid var(--#{$prefix}border-color-translucent);
+      border-radius: var(--#{$prefix}border-radius);
+      box-shadow: var(--#{$prefix}box-shadow-sm);
+    }
+  }
 
-//   h1, h2, h3 {
-//     margin-bottom: 1rem;
-//     text-decoration: underline;
-//     text-decoration-color: #678;
-//     text-decoration-style: wavy;
-//     text-decoration-thickness: from-font;
-//   }
+  h1, h2, h3 {
+    margin-bottom: 1rem;
+    text-decoration: underline;
+    text-decoration-color: #678;
+    text-decoration-style: wavy;
+    text-decoration-thickness: from-font;
+  }
 
-//   h2, h3 {
-//     margin-top: 1rem;
-//   }
+  h2, h3 {
+    margin-top: 1rem;
+  }
 
-//   h1 { font-size: 1.75em; }
-//   h2 { font-size: 1.5em; }
-//   h3 { font-size: 1.25em; }
-//   h4 { font-size: 1.125em; }
-//   h5, h6 { font-size: 1em; }
+  h1 { font-size: 1.75em; }
+  h2 { font-size: 1.5em; }
+  h3 { font-size: 1.25em; }
+  h4 { font-size: 1.125em; }
+  h5, h6 { font-size: 1em; }
 
-//   .footnotes {
-//     font-size: 80%;
-//     opacity: .8;
-//   }
+  .footnotes {
+    font-size: 80%;
+    opacity: .8;
+  }
 
-//   .asterism {
-//     // Hide the "⁂" text and show the four suit pips instead
-//     font-size: 0;
-//     line-height: 0;
-//     margin-block: 1.5rem;
+  .asterism {
+    // Hide the "⁂" text and show the four suit pips instead
+    font-size: 0;
+    line-height: 0;
+    margin-block: 1.5rem;
 
-//     &::before {
-//       // ♠ ♥ ♣ ♦ (U+FE0E keeps them as text, not emoji)
-//       content: "\2660\FE0E\2003\2665\FE0E\2003\2663\FE0E\2003\2666\FE0E";
-//       font-size: 1.25rem;
-//       line-height: 1.5;
-//     }
-//   }
+    &::before {
+      // ♠ ♥ ♣ ♦ (U+FE0E keeps them as text, not emoji)
+      content: "\2660\FE0E\2003\2665\FE0E\2003\2663\FE0E\2003\2666\FE0E";
+      font-size: 1.25rem;
+      line-height: 1.5;
+    }
+  }
 
-//   .table {
-//     // width: inherit;
-//     // min-width: 75%;
-//     // max-width: 75%;
-//     width: 80%;
-//     margin: 0 auto;
-//     margin-bottom: 1rem;
+  .table {
+    width: 80%;
+    margin: 0 auto;
+    margin-bottom: 1rem;
 
-//     @include media-breakpoint-down(md) {
-//       width: 100%;
-//     }
-//   }
+    @include media-breakpoint-down(md) {
+      width: 100%;
+    }
+  }
 
-// }
+}

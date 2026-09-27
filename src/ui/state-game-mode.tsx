@@ -1,56 +1,165 @@
 // Copyright (c) 2026 @SilvinoR
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import { i18n } from '../core/i18n';
+import { persistence } from '../core/persistence';
 import { gameModeSubmit, helpClick, settingsClick } from '../core/reactions';
-import type { Difficulty, GameMode, MatchCount } from '../types/game-state';
+import { 
+  GAME_MODE_1,
+  GAME_MODE_2,
+  GAME_MODE_3,
+  GAME_MODE_4,
+  GAME_MODE_5,
+  type GameMode,
+  GAME_DIFFICULTY_EASY,
+  GAME_DIFFICULTY_NORMAL,
+  GAME_DIFFICULTY_HARD,
+  type Difficulty,
+  GAME_COUNT_ONE,
+  GAME_COUNT_TWO,
+  GAME_COUNT_THREE,
+  GAME_COUNT_FOUR,
+  type MatchCount,
+} from '../types/game-state.d';
+import {
+  SAVE_GROUP_OPTION,
+  SAVE_NAME_MODE,
+  SAVE_NAME_DIFFICULTY,
+  SAVE_NAME_COUNT,
+} from '../core/constants';
 import { RadioButtons } from './radio-buttons';
-import { RadioImages } from './radio-images';
+import { RadioImages, type RadioImagesLayerClasses } from './radio-images';
 
-const GAME_MODES: readonly { id: GameMode; image: string; labelKey: string }[] = [
-  { id: 'mode1', image: '/assets/img/menu/mode-1.png', labelKey: 'state-game-mode:mode1' },
-  { id: 'mode2', image: '/assets/img/menu/mode-2.png', labelKey: 'state-game-mode:mode2' },
-  { id: 'mode3', image: '/assets/img/menu/mode-3.png', labelKey: 'state-game-mode:mode3' },
-  { id: 'mode4', image: '/assets/img/menu/mode-4.png', labelKey: 'state-game-mode:mode4' },
-  { id: 'mode5', image: '/assets/img/menu/mode-5.png', labelKey: 'state-game-mode:mode5' },
+const GAME_MODES: readonly {
+  id: GameMode;
+  image: string;
+  labelKey: string;
+  classes?: RadioImagesLayerClasses;
+}[] = [
+  { id: GAME_MODE_1, image: '/assets/img/menu/mode-1.png', labelKey: 'state-game-mode:mode1', classes: ['bg-color bg-texture', '', '', ''] },
+  { id: GAME_MODE_2, image: '/assets/img/menu/mode-2.png', labelKey: 'state-game-mode:mode2', classes: ['bg-color bg-texture', '', '', ''] },
+  { id: GAME_MODE_3, image: '/assets/img/menu/mode-3.png', labelKey: 'state-game-mode:mode3', classes: ['bg-color bg-texture', '', '', ''] },
+  { id: GAME_MODE_4, image: '/assets/img/menu/mode-4.png', labelKey: 'state-game-mode:mode4', classes: ['bg-color bg-texture', '', '', ''] },
+  { id: GAME_MODE_5, image: '/assets/img/menu/mode-5.png', labelKey: 'state-game-mode:mode5', classes: ['bg-color bg-texture', '', '', ''] },
 ];
 
 const DIFFICULTIES = [
-  { id: 'easy', labelKey: 'state-game-mode:difficulty-easy', variant: 'success' },
-  { id: 'normal', labelKey: 'state-game-mode:difficulty-normal', variant: 'info' },
-  { id: 'hard', labelKey: 'state-game-mode:difficulty-hard', variant: 'warning' },
+  { id: GAME_DIFFICULTY_EASY, labelKey: 'state-game-mode:difficulty-easy', variant: 'success' },
+  { id: GAME_DIFFICULTY_NORMAL, labelKey: 'state-game-mode:difficulty-normal', variant: 'info' },
+  { id: GAME_DIFFICULTY_HARD, labelKey: 'state-game-mode:difficulty-hard', variant: 'warning' },
 ] as const;
 
 const MATCH_COUNTS = [
-  { id: 'one', labelKey: 'state-game-mode:match-count-one', variant: 'secondary' },
-  { id: 'two', labelKey: 'state-game-mode:match-count-two', variant: 'secondary' },
-  { id: 'three', labelKey: 'state-game-mode:match-count-three', variant: 'secondary' },
-  { id: 'four', labelKey: 'state-game-mode:match-count-four', variant: 'secondary' },
+  { id: GAME_COUNT_ONE, labelKey: 'state-game-mode:match-count-one', variant: 'secondary' },
+  { id: GAME_COUNT_TWO, labelKey: 'state-game-mode:match-count-two', variant: 'secondary' },
+  { id: GAME_COUNT_THREE, labelKey: 'state-game-mode:match-count-three', variant: 'secondary' },
+  { id: GAME_COUNT_FOUR, labelKey: 'state-game-mode:match-count-four', variant: 'secondary' },
 ] as const;
 
+const DEFAULT_OPTIONS = {
+  mode: GAME_MODE_1,
+  difficulty: GAME_DIFFICULTY_NORMAL,
+  count: GAME_COUNT_TWO,
+} as const satisfies { mode: GameMode; difficulty: Difficulty; count: MatchCount };
+
 function applySelectionRules(gameMode: GameMode, difficulty: Difficulty) {
-  const disabledDifficulties: Difficulty[] = gameMode === 'mode5' ? ['easy'] : [];
+  const disabledDifficulties: Difficulty[] = gameMode === GAME_MODE_5 ? [GAME_DIFFICULTY_EASY] : [];
 
   return {
     disabledDifficulties,
-    difficulty: disabledDifficulties.includes(difficulty) ? 'normal' : difficulty,
+    difficulty: disabledDifficulties.includes(difficulty) ? GAME_DIFFICULTY_NORMAL : difficulty,
   };
 }
 
+function validOption<T extends string>(
+  value: string,
+  options: readonly { id: T }[],
+  defaultValue: T,
+): T {
+  return options.find((option) => option.id === value)?.id ?? defaultValue;
+}
+
+function saveOption(name: string, value: string): void {
+  void persistence.set(SAVE_GROUP_OPTION, name, value).catch((error: unknown) => {
+    console.error(`[Persistence] Failed to save option ${name}:`, error);
+  });
+}
+
 export function StateGameMode() {
-  const [gameMode, setGameMode] = useState<GameMode>('mode1');
-  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
-  const [matchCount, setMatchCount] = useState<MatchCount>('one');
+  const [gameMode, setGameMode] = useState<GameMode>(DEFAULT_OPTIONS.mode);
+  const [difficulty, setDifficulty] = useState<Difficulty>(DEFAULT_OPTIONS.difficulty);
+  const [matchCount, setMatchCount] = useState<MatchCount>(DEFAULT_OPTIONS.count);
+  const [optionsLoaded, setOptionsLoaded] = useState(false);
   const selectionRules = applySelectionRules(gameMode, difficulty);
+
+  useEffect(() => {
+    let active = true;
+
+    // Load each value after the prior read creates or opens the shared store.
+    const loadOptions = async () => {
+      try {
+        const storedMode = await persistence.get(SAVE_GROUP_OPTION, SAVE_NAME_MODE, DEFAULT_OPTIONS.mode);
+        const storedDifficulty = await persistence.get(
+          SAVE_GROUP_OPTION,
+          SAVE_NAME_DIFFICULTY,
+          DEFAULT_OPTIONS.difficulty,
+        );
+        const storedMatchCount = await persistence.get(SAVE_GROUP_OPTION, SAVE_NAME_COUNT, DEFAULT_OPTIONS.count);
+        if (!active) return;
+
+        // Validate stored data, then apply rules before publishing the loaded state.
+        const loadedMode = validOption(storedMode, GAME_MODES, DEFAULT_OPTIONS.mode);
+        const loadedDifficulty = validOption(
+          storedDifficulty,
+          DIFFICULTIES,
+          DEFAULT_OPTIONS.difficulty,
+        );
+        const loadedMatchCount = validOption(
+          storedMatchCount,
+          MATCH_COUNTS,
+          DEFAULT_OPTIONS.count,
+        );
+        const rules = applySelectionRules(loadedMode, loadedDifficulty);
+
+        setGameMode(loadedMode);
+        setDifficulty(rules.difficulty);
+        setMatchCount(loadedMatchCount);
+        if (rules.difficulty !== loadedDifficulty) saveOption(SAVE_NAME_DIFFICULTY, rules.difficulty);
+      } catch (error: unknown) {
+        console.error('[Persistence] Failed to load game options:', error);
+      } finally {
+        if (active) setOptionsLoaded(true);
+      }
+    };
+
+    void loadOptions();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // Apply dependent selection rules before committing the new game mode.
   const changeGameMode = (nextGameMode: GameMode) => {
+    const nextDifficulty = applySelectionRules(nextGameMode, difficulty).difficulty;
+
     setGameMode(nextGameMode);
-    setDifficulty((currentDifficulty) =>
-      applySelectionRules(nextGameMode, currentDifficulty).difficulty,
-    );
+    setDifficulty(nextDifficulty);
+    saveOption(SAVE_NAME_MODE, nextGameMode);
+    if (nextDifficulty !== difficulty) saveOption(SAVE_NAME_DIFFICULTY, nextDifficulty);
   };
+
+  const changeDifficulty = (nextDifficulty: Difficulty) => {
+    setDifficulty(nextDifficulty);
+    saveOption(SAVE_NAME_DIFFICULTY, nextDifficulty);
+  };
+
+  const changeMatchCount = (nextMatchCount: MatchCount) => {
+    setMatchCount(nextMatchCount);
+    saveOption(SAVE_NAME_COUNT, nextMatchCount);
+  };
+
+  if (!optionsLoaded) return null;
 
   return (
     <div className='container d-flex flex-column flex-grow-1'>
@@ -64,32 +173,32 @@ export function StateGameMode() {
 
               {/* ----- Game Mode ----- */}
               <fieldset className='mb-3'>
-                <legend className='h5 form-label d-block'>
+                <legend className='h5 form-label d-block app-mode-legend'>
                   {i18n.t('state-game-mode:game-mode')}
                 </legend>
                 <RadioImages
-                  name='game-mode'
+                  name={SAVE_NAME_MODE}
                   value={gameMode}
                   onChange={changeGameMode}
                   ariaLabel={i18n.t('state-game-mode:game-mode')}
-                  layerClassNames={['class1', 'class2', 'class3', 'class4']}
                   options={GAME_MODES.map((mode) => ({
                     id: mode.id,
                     image: mode.image,
                     label: i18n.t(mode.labelKey),
+                    classes: mode.classes,
                   }))}
                 />
               </fieldset>
 
               {/* ----- Difficulty ----- */}
               <fieldset className='mb-3'>
-                <legend className='h5 form-label d-block'>
+                <legend className='h5 form-label d-block app-mode-legend'>
                   {i18n.t('state-game-mode:difficulty')}
                 </legend>
                 <RadioButtons
-                  name='difficulty'
+                  name={SAVE_NAME_DIFFICULTY}
                   value={difficulty}
-                  onChange={setDifficulty}
+                  onChange={changeDifficulty}
                   ariaLabel={i18n.t('state-game-mode:difficulty')}
                   options={DIFFICULTIES.map((option) => ({
                     id: option.id,
@@ -102,13 +211,13 @@ export function StateGameMode() {
 
               {/* ----- Match Count ----- */}
               <fieldset className='mb-3'>
-                <legend className='h5 form-label d-block'>
+                <legend className='h5 form-label d-block app-mode-legend'>
                   {i18n.t('state-game-mode:match-count')}
                 </legend>
                 <RadioButtons
-                  name='match-count'
+                  name={SAVE_NAME_COUNT}
                   value={matchCount}
-                  onChange={setMatchCount}
+                  onChange={changeMatchCount}
                   ariaLabel={i18n.t('state-game-mode:match-count')}
                   options={MATCH_COUNTS.map((option) => ({
                     id: option.id,

@@ -3,10 +3,18 @@
 
 import { useState } from 'preact/hooks';
 
+export type RadioImagesLayerClasses = readonly [
+  background: string,
+  texture: string,
+  image: string,
+  overlay: string,
+];
+
 export interface RadioImagesOption<T extends string> {
   id: T;
-  label: string;
-  image: string;
+  label?: string;
+  image?: string;
+  classes?: RadioImagesLayerClasses;
   description?: string;
   disabled?: boolean;
 }
@@ -17,7 +25,6 @@ export interface RadioImagesProps<T extends string> {
   value: T;
   onChange: (value: T) => void;
   ariaLabel: string;
-  layerClassNames?: readonly [string, string, string, string];
   imageSizePercent?: number;
 }
 
@@ -42,7 +49,6 @@ export function RadioImages<T extends string>({
   value,
   onChange,
   ariaLabel,
-  layerClassNames,
   imageSizePercent = 100,
 }: RadioImagesProps<T>) {
   const selectedOption = options.find((option) => option.id === value);
@@ -81,7 +87,7 @@ export function RadioImages<T extends string>({
                 style={{ position: 'relative' }}
               >
                 <svg
-                  className={`radio-images-bg ${layerClassNames?.[0] ?? ''}`.trim()}
+                  className={`radio-images-bg ${option.classes?.[0] ?? ''}`.trim()}
                   style={LAYER_STYLE}
                   viewBox='0 0 256 256'
                   fill='transparent'
@@ -90,24 +96,26 @@ export function RadioImages<T extends string>({
                   <rect x='0' y='0' width='256' height='265' />
                 </svg>
                 <div
-                  className={`radio-images-tx ${layerClassNames?.[1] ?? ''}`.trim()}
+                  className={`radio-images-tx ${option.classes?.[1] ?? ''}`.trim()}
                   style={LAYER_STYLE}
                 />
-                <img
-                  className={`radio-images-img ${layerClassNames?.[2] ?? ''}`.trim()}
-                  style={{
-                    ...LAYER_STYLE,
-                    inset: '50% auto auto 50%',
-                    width: imageSize,
-                    height: imageSize,
-                    objectFit: 'contain',
-                    transform: 'translate(-50%, -50%)',
-                  }}
-                  src={option.image}
-                  alt={option.label}
-                />
+                {option.image && (
+                  <img
+                    className={`radio-images-img ${option.classes?.[2] ?? ''}`.trim()}
+                    style={{
+                      ...LAYER_STYLE,
+                      inset: '50% auto auto 50%',
+                      width: imageSize,
+                      height: imageSize,
+                      objectFit: 'contain',
+                      transform: 'translate(-50%, -50%)',
+                    }}
+                    src={option.image}
+                    alt={option.label}
+                  />
+                )}
                 <div 
-                  className={`radio-images-ov ${layerClassNames?.[3] ?? ''}`.trim()} 
+                  className={`radio-images-ov ${option.classes?.[3] ?? ''}`.trim()} 
                   style={LAYER_STYLE}
                 />
               </label>
@@ -115,7 +123,7 @@ export function RadioImages<T extends string>({
           );
         })}
       </div>
-      <div className='form-text text-muted' aria-live='polite'>
+      <div className='form-text' aria-live='polite'>
         {selectedOption?.description ?? selectedOption?.label}
       </div>
     </>

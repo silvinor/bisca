@@ -79,7 +79,7 @@ export async function loadDeckCardAspectRatio(id: string, signal?: AbortSignal):
 
 /** Builds the preview image URL shown for a deck in the deck-selection list. */
 export function deckPreviewUrl(id: string): string {
-  return `${DECK_ASSET_BASE}${encodeURIComponent(id)}.png `;
+  return `${DECK_ASSET_BASE}${encodeURIComponent(id)}.png`;
 }
 
 /** Builds the image URL for one of a deck's selectable card backs. */

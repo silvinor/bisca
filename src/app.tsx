@@ -30,8 +30,8 @@ const navButtonsByState: Record<ActiveGameState, string> = {
   [StateMain.SELECT_DEALER]: 'shq',
   [StateMain.PLAY]: 'shq',
   [StateMain.WIN_LOSE]: '',
-  [StateMain.SETTINGS]: 'hc',
-  [StateMain.HELP]: 'c',
+  [StateMain.SETTINGS]: '',
+  [StateMain.HELP]: '',
   [StateMain.RESUME]: '',
 };
 
@@ -82,9 +82,9 @@ export function App() {
   useLayoutEffect(() => gameEngine.subscribe(setNavState), []);
 
   return (
-    <div className='d-flex flex-column min-vh-100'>
-      <header id='app_header'>
-        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div className='d-flex flex-column vh-100 overflow-hidden'>
+      <header id='app-header' className='flex-shrink-0'>
+        <nav class="navbar navbar-expand-lg">
           <div class="container-fluid">
             <div class="navbar-brand">
               <img
@@ -105,8 +105,8 @@ export function App() {
           </div>
         </nav>
       </header>
-      <main id="app_main" className='d-flex flex-grow-1' />
-      <footer id="app_footer" className='sticky-bottom text-center bg-body-tertiary py-1'>
+      <main id="app_main" className='d-flex flex-grow-1 overflow-auto' style="min-height: 0;" />
+      <footer id="app-footer" className='flex-shrink-0 text-center py-1'>
         <i class="fa-solid">©</i> {APP_YEAR} {APP_COPYRIGHT_HOLDER} <i class="fa-solid">&#xf142;</i> v{APP_VERSION} ({APP_BUILD}) <i class="fa-solid">&#xf142;</i> <a href={APP_URL}><i class="fa-brands fa-github-alt" /></a>
       </footer>
     </div>

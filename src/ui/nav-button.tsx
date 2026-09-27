@@ -9,24 +9,6 @@ interface NavButtonProps {
   onClick: () => void;
 }
 
-interface TooltipInstance {
-  hide(): void;
-}
-
-interface TooltipPlugin {
-  getInstance(element: Element): TooltipInstance | null;
-}
-
-function hideTooltip(button: HTMLButtonElement): void {
-  const trigger = button.querySelector('[data-bs-toggle="tooltip"]');
-  const Tooltip = (window as Window & {
-    bootstrap?: { Tooltip?: TooltipPlugin };
-  }).bootstrap?.Tooltip;
-
-  if (trigger && Tooltip) Tooltip.getInstance(trigger)?.hide();
-  button.blur();
-}
-
 export function NavButton({ bs_class, fa_class = '', fa_inner, text, onClick }: NavButtonProps) {
   if (!fa_class) fa_class = 'fa-solid fa-width-fixed';
   return (
@@ -35,7 +17,8 @@ export function NavButton({ bs_class, fa_class = '', fa_inner, text, onClick }: 
       className={`app-nav-button btn btn-sm ${bs_class}`}
       aria-label={text}
       onClick={(event) => {
-        hideTooltip(event.currentTarget);
+        // Tooltip disposal now lives in reactions.ts, run by onClick itself.
+        event.currentTarget.blur();
         onClick();
       }}
     >
