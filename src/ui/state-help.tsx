@@ -36,10 +36,24 @@ function extractHelpHeading(markdown: string): { title: string | null; body: str
   return { title: null, body: markdown };
 }
 
+const CLOSE_KEYS = new Set(['Enter', ' ', 'Escape']);
+
 export function StateHelp() {
   const [helpHtml, setHelpHtml] = useState<string | null>(null);
   const [helpTitle, setHelpTitle] = useState<string | null>(null);
   const [loadError, setLoadError] = useState(false);
+
+  // Listen at document level so the shortcuts close the modal regardless of
+  // which element (if any) currently has focus.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!CLOSE_KEYS.has(event.key)) return;
+      event.preventDefault();
+      closeClick();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();

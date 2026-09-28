@@ -86,6 +86,20 @@ function saveOption(name: string, value: string): void {
   });
 }
 
+const DIFFICULTY_KEYS: Record<string, Difficulty> = {
+  e: GAME_DIFFICULTY_EASY,
+  n: GAME_DIFFICULTY_NORMAL,
+  m: GAME_DIFFICULTY_NORMAL,
+  h: GAME_DIFFICULTY_HARD,
+};
+
+const MATCH_COUNT_KEYS: Record<string, MatchCount> = {
+  '1': GAME_COUNT_ONE,
+  '2': GAME_COUNT_TWO,
+  '3': GAME_COUNT_THREE,
+  '4': GAME_COUNT_FOUR,
+};
+
 export function StateGameMode() {
   const [gameMode, setGameMode] = useState<GameMode>(DEFAULT_OPTIONS.mode);
   const [difficulty, setDifficulty] = useState<Difficulty>(DEFAULT_OPTIONS.difficulty);
@@ -158,6 +172,53 @@ export function StateGameMode() {
     setMatchCount(nextMatchCount);
     saveOption(SAVE_NAME_COUNT, nextMatchCount);
   };
+
+  // Screen-wide shortcuts (carried over from the old intro screen): letter
+  // and digit keys jump straight to a difficulty or match count, '.' and '/'
+  // open settings/help, and Enter starts the game. Typing into a text field
+  // or using a modifier key leaves the keystroke alone.
+  useEffect(() => {
+    if (!optionsLoaded) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
+      const target = event.target;
+      if (target instanceof HTMLElement &&
+        (target.isContentEditable || target.matches('input:not([type="radio"]), textarea, select'))) return;
+
+      const key = event.key.toLowerCase();
+      if (key === 'enter' || key === 'return') {
+        if (target instanceof HTMLElement && target.closest('button')) return;
+        event.preventDefault();
+        gameModeSubmit(gameMode);
+        return;
+      }
+      if (key === '.') {
+        event.preventDefault();
+        settingsClick();
+        return;
+      }
+      if (key === '/') {
+        event.preventDefault();
+        helpClick();
+        return;
+      }
+      const nextDifficulty = DIFFICULTY_KEYS[key];
+      if (nextDifficulty && !selectionRules.disabledDifficulties.includes(nextDifficulty)) {
+        event.preventDefault();
+        changeDifficulty(nextDifficulty);
+        return;
+      }
+      const nextMatchCount = MATCH_COUNT_KEYS[key];
+      if (nextMatchCount) {
+        event.preventDefault();
+        changeMatchCount(nextMatchCount);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [optionsLoaded, gameMode, difficulty, selectionRules.disabledDifficulties]);
 
   if (!optionsLoaded) return null;
 

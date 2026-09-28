@@ -30,7 +30,7 @@
     "bootstrap": "5.3.8",
     "npm-run-all2": "^9.0.3",
     "sass": "1.78.0",
-    "sharp": "^0.35.4",
+    "sharp": "^0.35.5",
     "typescript": "~7.0.2",
     "vite": "^8.3.1"
   },

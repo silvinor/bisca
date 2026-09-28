@@ -195,6 +195,14 @@ function SettingsRadioRow<T extends string>({
   );
 }
 
+// Escape closes the modal regardless of focus; Enter/Space are left alone so
+// they keep working as normal form-control activation inside the dialog.
+function onEscapeKeyDown(event: KeyboardEvent): void {
+  if (event.key !== 'Escape') return;
+  event.preventDefault();
+  closeClick();
+}
+
 export function StateSettings() {
   const [gameDeck, setGameDeck] = useState<string>(DEFAULT_OPTIONS.gameDeck);
   const [cardBack, setCardBack] = useState<string>(DEFAULT_OPTIONS.cardBack);
@@ -266,6 +274,11 @@ export function StateSettings() {
     return () => {
       active = false;
     };
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('keydown', onEscapeKeyDown);
+    return () => document.removeEventListener('keydown', onEscapeKeyDown);
   }, []);
 
   useEffect(() => {
