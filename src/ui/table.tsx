@@ -2,8 +2,12 @@
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 import type { ComponentChildren } from 'preact';
-import { useLayoutEffect, useRef } from 'preact/hooks';
-import { PLAYING_SURFACE_ASPECT_RATIO } from '../core/constants';
+import { useLayoutEffect, useRef, useState } from 'preact/hooks';
+import {
+  PLAYING_SURFACE_ASPECT_RATIO,
+  PLAYING_CARD_SIZE_RATIO
+} from '../core/constants';
+import { applyPlayingCardHeight } from '../core/dynamic-css';
 
 interface TableProps {
   children?: ComponentChildren;
@@ -11,11 +15,11 @@ interface TableProps {
 
 export function Table({ children }: TableProps) {
   const surfaceRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState({ width: 0, height: 0 });
 
   useLayoutEffect(() => {
-    const surface = surfaceRef.current;
-    const host = surface?.parentElement;
-    if (!surface || !host) return;
+    const host = surfaceRef.current?.parentElement;
+    if (!host) return;
 
     const resizeSurface = () => {
       const availableWidth = host.clientWidth;
@@ -30,8 +34,8 @@ export function Table({ children }: TableProps) {
         ? availableHeight
         : availableWidth / PLAYING_SURFACE_ASPECT_RATIO;
 
-      surface.style.width = `${width}px`;
-      surface.style.height = `${height}px`;
+      setSize({ width, height });
+      applyPlayingCardHeight(height * PLAYING_CARD_SIZE_RATIO);
     };
 
     const resizeObserver = new ResizeObserver(resizeSurface);
@@ -42,6 +46,13 @@ export function Table({ children }: TableProps) {
   }, []);
 
   return (
-    <div ref={surfaceRef} className='surface'>{children}</div>
+    <div
+      ref={surfaceRef}
+      className='play-table position-relative m-auto'
+      style={{ width: `${size.width}px`, height: `${size.height}px` }}
+      role='group'
+    >
+      {children}
+    </div>
   );
 }

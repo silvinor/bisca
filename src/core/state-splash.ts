@@ -12,19 +12,26 @@ export class SplashGameState extends GameState<StateMain> {
 
   protected init(): void {
     logger.debug('SPLASH --> Init')
+    // ... do nothing ...
   }
 
-  protected tick(): StateMain {
+  protected tick(): void {
     logger.debug('SPLASH --> Tick');
-
-    return StateMain.GAME_MODE; // move on to next state
+    // ... do nothing ...
   }
 
   protected draw(): void {
     logger.debug('SPLASH --> Draw');
+    this.trigger(undefined);
+  }
+
+  protected tock(): StateMain {
+    logger.debug('SPLASH --> Tock');
+    return StateMain.GAME_MODE; // move on to next state
   }
 
   protected end(): void {
     logger.debug('SPLASH -->  End')
+    // ... do nothing ...
   }
 }

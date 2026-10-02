@@ -22,7 +22,7 @@ This loop must block. It also needs a trigger event to loop again: trigger, then
 - When a node needs trigger data, `tick()` reads the latest one from `this.lastTrigger`.
 - An event handler, from `reactions.ts`, a timer, or similar, calls `node.trigger(payload)`. This is the one well-known call that makes the loop cycle over: it stores the payload in `this.lastTrigger` and releases the pending wait.
 
-A node with no payload uses `GameState<StateMain>` (`TriggerPayload` defaults to `void`) and calls `node.trigger()`. A node whose trigger carries data, such as the chosen game mode, extends `GameState<StateMain, GameMode>`, and its `tick()` reads that data from `this.lastTrigger`. See `src/core/state-game-mode.ts` for the reference example.
+A node with no payload uses `GameState<StateMain>` (`TriggerPayload` defaults to `void`) and calls `node.trigger()`. A node whose trigger carries data, such as the chosen game mode, extends `GameState<StateMain, GameMode>`, and its `tick()` reads that data from `this.lastTrigger`. See `src/core/state-mode.ts` for the reference example.
 
 ## Main State Engine
 
@@ -69,13 +69,15 @@ stateDiagram-v2
     SELECT_DEALER --> HELP : ⚑
     HELP --> SELECT_DEALER : ⚐
 
+    SELECT_DEALER --> GAME_MODE : ×
+    PLAY --> GAME_MODE : × (Are you sure?)
 ```
 
 *Note:* **⚑⚐** → You can select both `SETTINGS` and `HELP` at any time. When one finishes, it returns to the calling state.
 
 **How ⚑⚐ works:** Opening an overlay is an interrupt, not a normal transition. `gameEngine.openOverlay(state)` stops whatever node is current, pushes it onto a FILO stack, and starts the overlay. This works from any node, at any time, because it does not go through that node's own `tick()`. `SETTINGS` and `HELP` can open each other the same way, so the stack can hold more than one saved node.
 
-Closing an overlay IS a normal transition, driven by that overlay's own `tick()`. The global close button calls `trigger()` on the active overlay node. Its `tick()` sees `this.triggered` and returns `StateMain.RESUME`. `StateMain.RESUME` is not a real screen: the engine reads it as "pop the FILO stack and continue whatever node this overlay interrupted," restarting that node with `start()`.
+Closing an overlay IS a normal transition, driven by that overlay's own `tick()`. The global close button calls `trigger()` on the active overlay node. Its `tock()` sees `this.triggered` and returns `StateMain.RESUME`. `StateMain.RESUME` is not a real screen: the engine reads it as "pop the FILO stack and continue whatever node this overlay interrupted," restarting that node with `start()`.
 
 ## `INIT` Mini State Engine
 
@@ -130,7 +132,7 @@ stateDiagram-v2
 stateDiagram-v2
 
     state "SELECT_DEALER_STATE_INIT" as INIT
-    state "SELECT_DEALER_FAN" as FAN : Shuffle and show
+    state "SELECT_DEALER_DRAW" as FAN : Shuffle and show
     state "SELECT_DEALER_USER_PICK" as USER_PICK : Wait for user pick
     state "SELECT_DEALER_COMPUTER_PICK" as COMPUTER_PICK : Computer picks
     state "SELECT_DEALER_EVAL" as EVAL {

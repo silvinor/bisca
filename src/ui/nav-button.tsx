@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 interface NavButtonProps {
-  bs_class: string;
-  fa_class?: string;
-  fa_inner: string;
   text: string;
   onClick: () => void;
+  bs_class: string;
+  fa_class?: string;
+  fa_inner?: string;
 }
 
-export function NavButton({ bs_class, fa_class = '', fa_inner, text, onClick }: NavButtonProps) {
+export function NavButton({ text, onClick, bs_class, fa_class = '', fa_inner = '' }: NavButtonProps) {
   if (!fa_class) fa_class = 'fa-solid fa-width-fixed';
   return (
     <button

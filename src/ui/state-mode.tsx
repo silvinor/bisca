@@ -3,7 +3,6 @@
 
 import { useEffect, useState } from 'preact/hooks';
 import { i18n } from '../core/i18n';
-import { persistence } from '../core/persistence';
 import { gameModeSubmit, helpClick, settingsClick } from '../core/reactions';
 import { 
   GAME_MODE_1,
@@ -23,10 +22,11 @@ import {
   type MatchCount,
 } from '../types/game-state.d';
 import {
-  SAVE_GROUP_OPTION,
   SAVE_NAME_MODE,
   SAVE_NAME_DIFFICULTY,
   SAVE_NAME_COUNT,
+  APP_LOGO_FILE,
+  ACTION_GO,
 } from '../core/constants';
 import { RadioButtons } from './radio-buttons';
 import { RadioImages, type RadioImagesLayerClasses } from './radio-images';
@@ -37,31 +37,33 @@ const GAME_MODES: readonly {
   labelKey: string;
   classes?: RadioImagesLayerClasses;
 }[] = [
-  { id: GAME_MODE_1, image: '/assets/img/menu/mode-1.png', labelKey: 'state-game-mode:mode1', classes: ['bg-color bg-texture', '', '', ''] },
-  { id: GAME_MODE_2, image: '/assets/img/menu/mode-2.png', labelKey: 'state-game-mode:mode2', classes: ['bg-color bg-texture', '', '', ''] },
-  { id: GAME_MODE_3, image: '/assets/img/menu/mode-3.png', labelKey: 'state-game-mode:mode3', classes: ['bg-color bg-texture', '', '', ''] },
-  { id: GAME_MODE_4, image: '/assets/img/menu/mode-4.png', labelKey: 'state-game-mode:mode4', classes: ['bg-color bg-texture', '', '', ''] },
-  { id: GAME_MODE_5, image: '/assets/img/menu/mode-5.png', labelKey: 'state-game-mode:mode5', classes: ['bg-color bg-texture', '', '', ''] },
+  { id: GAME_MODE_1, image: '/assets/img/menu/mode-1.png', labelKey: 'state-mode:mode1', classes: ['bg-color bg-texture', '', '', ''] },
+  { id: GAME_MODE_2, image: '/assets/img/menu/mode-2.png', labelKey: 'state-mode:mode2', classes: ['bg-color bg-texture', '', '', ''] },
+  { id: GAME_MODE_3, image: '/assets/img/menu/mode-3.png', labelKey: 'state-mode:mode3', classes: ['bg-color bg-texture', '', '', ''] },
+  { id: GAME_MODE_4, image: '/assets/img/menu/mode-4.png', labelKey: 'state-mode:mode4', classes: ['bg-color bg-texture', '', '', ''] },
+  { id: GAME_MODE_5, image: '/assets/img/menu/mode-5.png', labelKey: 'state-mode:mode5', classes: ['bg-color bg-texture', '', '', ''] },
 ];
 
-const DIFFICULTIES = [
-  { id: GAME_DIFFICULTY_EASY, labelKey: 'state-game-mode:difficulty-easy', variant: 'success' },
-  { id: GAME_DIFFICULTY_NORMAL, labelKey: 'state-game-mode:difficulty-normal', variant: 'info' },
-  { id: GAME_DIFFICULTY_HARD, labelKey: 'state-game-mode:difficulty-hard', variant: 'warning' },
+const DIFFICULTIES: readonly {
+  id: Difficulty;
+  labelKey: string;
+  variant: string;
+}[] = [
+  { id: GAME_DIFFICULTY_EASY, labelKey: 'state-mode:difficulty-easy', variant: 'success' },
+  { id: GAME_DIFFICULTY_NORMAL, labelKey: 'state-mode:difficulty-normal', variant: 'info' },
+  { id: GAME_DIFFICULTY_HARD, labelKey: 'state-mode:difficulty-hard', variant: 'warning' },
 ] as const;
 
-const MATCH_COUNTS = [
-  { id: GAME_COUNT_ONE, labelKey: 'state-game-mode:match-count-one', variant: 'secondary' },
-  { id: GAME_COUNT_TWO, labelKey: 'state-game-mode:match-count-two', variant: 'secondary' },
-  { id: GAME_COUNT_THREE, labelKey: 'state-game-mode:match-count-three', variant: 'secondary' },
-  { id: GAME_COUNT_FOUR, labelKey: 'state-game-mode:match-count-four', variant: 'secondary' },
+const MATCH_COUNTS: readonly {
+  id: MatchCount;
+  labelKey: string;
+  variant: string;
+}[] = [
+  { id: GAME_COUNT_ONE, labelKey: 'state-mode:match-count-one', variant: 'secondary' },
+  { id: GAME_COUNT_TWO, labelKey: 'state-mode:match-count-two', variant: 'secondary' },
+  { id: GAME_COUNT_THREE, labelKey: 'state-mode:match-count-three', variant: 'secondary' },
+  { id: GAME_COUNT_FOUR, labelKey: 'state-mode:match-count-four', variant: 'secondary' },
 ] as const;
-
-const DEFAULT_OPTIONS = {
-  mode: GAME_MODE_1,
-  difficulty: GAME_DIFFICULTY_NORMAL,
-  count: GAME_COUNT_TWO,
-} as const satisfies { mode: GameMode; difficulty: Difficulty; count: MatchCount };
 
 function applySelectionRules(gameMode: GameMode, difficulty: Difficulty) {
   const disabledDifficulties: Difficulty[] = gameMode === GAME_MODE_5 ? [GAME_DIFFICULTY_EASY] : [];
@@ -70,20 +72,6 @@ function applySelectionRules(gameMode: GameMode, difficulty: Difficulty) {
     disabledDifficulties,
     difficulty: disabledDifficulties.includes(difficulty) ? GAME_DIFFICULTY_NORMAL : difficulty,
   };
-}
-
-function validOption<T extends string>(
-  value: string,
-  options: readonly { id: T }[],
-  defaultValue: T,
-): T {
-  return options.find((option) => option.id === value)?.id ?? defaultValue;
-}
-
-function saveOption(name: string, value: string): void {
-  void persistence.set(SAVE_GROUP_OPTION, name, value).catch((error: unknown) => {
-    console.error(`[Persistence] Failed to save option ${name}:`, error);
-  });
 }
 
 const DIFFICULTY_KEYS: Record<string, Difficulty> = {
@@ -100,77 +88,43 @@ const MATCH_COUNT_KEYS: Record<string, MatchCount> = {
   '4': GAME_COUNT_FOUR,
 };
 
-export function StateGameMode() {
-  const [gameMode, setGameMode] = useState<GameMode>(DEFAULT_OPTIONS.mode);
-  const [difficulty, setDifficulty] = useState<Difficulty>(DEFAULT_OPTIONS.difficulty);
-  const [matchCount, setMatchCount] = useState<MatchCount>(DEFAULT_OPTIONS.count);
-  const [optionsLoaded, setOptionsLoaded] = useState(false);
+export interface StateGameModeProps {
+  mode: GameMode;
+  difficulty: Difficulty;
+  matchCount: MatchCount;
+  onChangeMode: (mode: GameMode, difficulty: Difficulty) => Difficulty;
+  onChangeDifficulty: (difficulty: Difficulty) => void;
+  onChangeMatchCount: (matchCount: MatchCount) => void;
+}
+
+export function StateGameMode({
+  mode,
+  difficulty: initialDifficulty,
+  matchCount: initialMatchCount,
+  onChangeMode,
+  onChangeDifficulty,
+  onChangeMatchCount,
+}: StateGameModeProps) {
+  const [gameMode, setGameMode] = useState<GameMode>(mode);
+  const [difficulty, setDifficulty] = useState<Difficulty>(initialDifficulty);
+  const [matchCount, setMatchCount] = useState<MatchCount>(initialMatchCount);
   const selectionRules = applySelectionRules(gameMode, difficulty);
 
-  useEffect(() => {
-    let active = true;
-
-    // Load each value after the prior read creates or opens the shared store.
-    const loadOptions = async () => {
-      try {
-        const storedMode = await persistence.get(SAVE_GROUP_OPTION, SAVE_NAME_MODE, DEFAULT_OPTIONS.mode);
-        const storedDifficulty = await persistence.get(
-          SAVE_GROUP_OPTION,
-          SAVE_NAME_DIFFICULTY,
-          DEFAULT_OPTIONS.difficulty,
-        );
-        const storedMatchCount = await persistence.get(SAVE_GROUP_OPTION, SAVE_NAME_COUNT, DEFAULT_OPTIONS.count);
-        if (!active) return;
-
-        // Validate stored data, then apply rules before publishing the loaded state.
-        const loadedMode = validOption(storedMode, GAME_MODES, DEFAULT_OPTIONS.mode);
-        const loadedDifficulty = validOption(
-          storedDifficulty,
-          DIFFICULTIES,
-          DEFAULT_OPTIONS.difficulty,
-        );
-        const loadedMatchCount = validOption(
-          storedMatchCount,
-          MATCH_COUNTS,
-          DEFAULT_OPTIONS.count,
-        );
-        const rules = applySelectionRules(loadedMode, loadedDifficulty);
-
-        setGameMode(loadedMode);
-        setDifficulty(rules.difficulty);
-        setMatchCount(loadedMatchCount);
-        if (rules.difficulty !== loadedDifficulty) saveOption(SAVE_NAME_DIFFICULTY, rules.difficulty);
-      } catch (error: unknown) {
-        console.error('[Persistence] Failed to load game options:', error);
-      } finally {
-        if (active) setOptionsLoaded(true);
-      }
-    };
-
-    void loadOptions();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  // Apply dependent selection rules before committing the new game mode.
-  const changeGameMode = (nextGameMode: GameMode) => {
-    const nextDifficulty = applySelectionRules(nextGameMode, difficulty).difficulty;
-
+  // Apply the values returned by the core handler to the visible controls.
+  const handleModeChange = (nextGameMode: GameMode) => {
+    const nextDifficulty = onChangeMode(nextGameMode, difficulty);
     setGameMode(nextGameMode);
     setDifficulty(nextDifficulty);
-    saveOption(SAVE_NAME_MODE, nextGameMode);
-    if (nextDifficulty !== difficulty) saveOption(SAVE_NAME_DIFFICULTY, nextDifficulty);
   };
 
-  const changeDifficulty = (nextDifficulty: Difficulty) => {
+  const handleDifficultyChange = (nextDifficulty: Difficulty) => {
     setDifficulty(nextDifficulty);
-    saveOption(SAVE_NAME_DIFFICULTY, nextDifficulty);
+    onChangeDifficulty(nextDifficulty);
   };
 
-  const changeMatchCount = (nextMatchCount: MatchCount) => {
+  const handleMatchCountChange = (nextMatchCount: MatchCount) => {
     setMatchCount(nextMatchCount);
-    saveOption(SAVE_NAME_COUNT, nextMatchCount);
+    onChangeMatchCount(nextMatchCount);
   };
 
   // Screen-wide shortcuts (carried over from the old intro screen): letter
@@ -178,8 +132,6 @@ export function StateGameMode() {
   // open settings/help, and Enter starts the game. Typing into a text field
   // or using a modifier key leaves the keystroke alone.
   useEffect(() => {
-    if (!optionsLoaded) return;
-
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.defaultPrevented || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
       const target = event.target;
@@ -190,7 +142,7 @@ export function StateGameMode() {
       if (key === 'enter' || key === 'return') {
         if (target instanceof HTMLElement && target.closest('button')) return;
         event.preventDefault();
-        gameModeSubmit(gameMode);
+        gameModeSubmit({ action: ACTION_GO, mode: gameMode, difficulty, matchCount });
         return;
       }
       if (key === '.') {
@@ -206,21 +158,19 @@ export function StateGameMode() {
       const nextDifficulty = DIFFICULTY_KEYS[key];
       if (nextDifficulty && !selectionRules.disabledDifficulties.includes(nextDifficulty)) {
         event.preventDefault();
-        changeDifficulty(nextDifficulty);
+        handleDifficultyChange(nextDifficulty);
         return;
       }
       const nextMatchCount = MATCH_COUNT_KEYS[key];
       if (nextMatchCount) {
         event.preventDefault();
-        changeMatchCount(nextMatchCount);
+        handleMatchCountChange(nextMatchCount);
       }
     };
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [optionsLoaded, gameMode, difficulty, selectionRules.disabledDifficulties]);
-
-  if (!optionsLoaded) return null;
+  }, [gameMode, difficulty, matchCount, selectionRules.disabledDifficulties]);
 
   return (
     <div className='container d-flex flex-column flex-grow-1'>
@@ -228,24 +178,26 @@ export function StateGameMode() {
         <div className='col-12 col-sm-11 col-md-9 col-lg-7'>
           <div className='card shadow rounded-4'>
             <div className='card-header text-center'>
-              <img src='/assets/img/logo.svg' height='32' width='auto'  />
+              <img src={APP_LOGO_FILE} height='32' width='auto'  />
             </div>
             <div className='card-body'>
 
               {/* ----- Game Mode ----- */}
               <fieldset className='mb-3'>
                 <legend className='h5 form-label d-block app-mode-legend'>
-                  {i18n.t('state-game-mode:game-mode')}
+                  {i18n.t('state-mode:game-mode')}
                 </legend>
                 <RadioImages
                   name={SAVE_NAME_MODE}
                   value={gameMode}
-                  onChange={changeGameMode}
-                  ariaLabel={i18n.t('state-game-mode:game-mode')}
+                  onChange={handleModeChange}
+                  ariaLabel={i18n.t('state-mode:game-mode')}
                   options={GAME_MODES.map((mode) => ({
                     id: mode.id,
                     image: mode.image,
                     label: i18n.t(mode.labelKey),
+                    description: i18n.t(mode.labelKey),
+                    hint: true,
                     classes: mode.classes,
                   }))}
                 />
@@ -254,13 +206,13 @@ export function StateGameMode() {
               {/* ----- Difficulty ----- */}
               <fieldset className='mb-3'>
                 <legend className='h5 form-label d-block app-mode-legend'>
-                  {i18n.t('state-game-mode:difficulty')}
+                  {i18n.t('state-mode:difficulty')}
                 </legend>
                 <RadioButtons
                   name={SAVE_NAME_DIFFICULTY}
                   value={difficulty}
-                  onChange={changeDifficulty}
-                  ariaLabel={i18n.t('state-game-mode:difficulty')}
+                  onChange={handleDifficultyChange}
+                  ariaLabel={i18n.t('state-mode:difficulty')}
                   options={DIFFICULTIES.map((option) => ({
                     id: option.id,
                     label: i18n.t(option.labelKey),
@@ -273,13 +225,13 @@ export function StateGameMode() {
               {/* ----- Match Count ----- */}
               <fieldset className='mb-3'>
                 <legend className='h5 form-label d-block app-mode-legend'>
-                  {i18n.t('state-game-mode:match-count')}
+                  {i18n.t('state-mode:match-count')}
                 </legend>
                 <RadioButtons
                   name={SAVE_NAME_COUNT}
                   value={matchCount}
-                  onChange={changeMatchCount}
-                  ariaLabel={i18n.t('state-game-mode:match-count')}
+                  onChange={handleMatchCountChange}
+                  ariaLabel={i18n.t('state-mode:match-count')}
                   options={MATCH_COUNTS.map((option) => ({
                     id: option.id,
                     label: i18n.t(option.labelKey),
@@ -294,10 +246,10 @@ export function StateGameMode() {
                 <button
                   type='button'
                   className='btn btn-success flex-grow-1'
-                  onClick={() => gameModeSubmit(gameMode)}
+                  onClick={() => gameModeSubmit({ action: ACTION_GO, mode: gameMode, difficulty, matchCount })}
                 >
                   <i className='fa-solid me-2' aria-hidden='true'>&#xf04b;</i>
-                  {i18n.t('state-game-mode:start')}
+                  {i18n.t('state-mode:start')}
                 </button>
                 <button
                   type='button'

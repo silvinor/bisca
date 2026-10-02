@@ -3,10 +3,14 @@
 
 import { useLayoutEffect, useState } from 'preact/hooks';
 import { i18n } from './core/i18n'
-import { gameEngine, type ActiveGameState } from './core/main-loop';
+import { 
+  gameEngine, 
+  type ActiveGameState
+} from './core/main-loop';
 import {
   I18N_APP_NAME,
   APP_COPYRIGHT_HOLDER,
+  APP_LOGO_FILE,
 } from './core/constants';
 import {
   APP_YEAR,
@@ -22,6 +26,7 @@ import {
   quitClick,
   settingsClick,
 } from './core/reactions';
+import { logger } from './core/logger';
 
 const navButtonsByState: Record<ActiveGameState, string> = {
   [StateMain.INIT]: '',
@@ -36,13 +41,16 @@ const navButtonsByState: Record<ActiveGameState, string> = {
 };
 
 function renderNavButtons(state: ActiveGameState) {
+
+  logger.debug(`renderNavButtons(${state})`);
+
   const buttons = navButtonsByState[state];
 
   return (
     <>
       {buttons.includes('s') && (
         <NavButton
-          bs_class='btn-outline-primary'
+          bs_class='btn-primary'
           fa_inner='&#x2699;'
           text={i18n.t('app:settings')}
           onClick={settingsClick}
@@ -50,7 +58,8 @@ function renderNavButtons(state: ActiveGameState) {
       )}
       {buttons.includes('h') && (
         <NavButton
-          bs_class='btn-outline-info'
+          bs_class='btn-info'
+          // fa_class='fa-solid fa-question'
           fa_inner='?'
           text={i18n.t('app:help')}
           onClick={helpClick}
@@ -58,7 +67,7 @@ function renderNavButtons(state: ActiveGameState) {
       )}
       {buttons.includes('c') && (
         <NavButton
-          bs_class='btn-outline-danger'
+          bs_class='btn-danger'
           fa_inner='&#x00D7;'
           text={i18n.t('app:close')}
           onClick={closeClick}
@@ -66,7 +75,7 @@ function renderNavButtons(state: ActiveGameState) {
       )}
       {buttons.includes('q') && (
         <NavButton
-          bs_class='btn-outline-secondary'
+          bs_class='btn-secondary'
           fa_inner='&#x00D7;'
           text={i18n.t('app:quit')}
           onClick={quitClick}
@@ -77,7 +86,7 @@ function renderNavButtons(state: ActiveGameState) {
 }
 
 export function App() {
-  const [navState, setNavState] = useState<ActiveGameState>(gameEngine.activeState);
+  const [navState, setNavState] = useState<ActiveGameState>(gameEngine.state);
 
   useLayoutEffect(() => gameEngine.subscribe(setNavState), []);
 
@@ -88,7 +97,7 @@ export function App() {
           <div class="container-fluid">
             <div class="navbar-brand">
               <img
-                src="assets/img/logo.svg"
+                src={APP_LOGO_FILE}
                 alt={i18n.t(I18N_APP_NAME)}
                 className='app-logo'
                 />
@@ -105,7 +114,7 @@ export function App() {
           </div>
         </nav>
       </header>
-      <main id="app_main" className='d-flex flex-grow-1 overflow-auto' style="min-height: 0;" />
+      <main id="app-main" className='d-flex flex-grow-1 overflow-auto' style="min-height: 0;" />
       <footer id="app-footer" className='flex-shrink-0 text-center py-1'>
         <i class="fa-solid">©</i> {APP_YEAR} {APP_COPYRIGHT_HOLDER} <i class="fa-solid">&#xf142;</i> v{APP_VERSION} ({APP_BUILD}) <i class="fa-solid">&#xf142;</i> <a href={APP_URL}><i class="fa-brands fa-github-alt" /></a>
       </footer>

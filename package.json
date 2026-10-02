@@ -15,24 +15,23 @@
     "prebuild:images": "node scripts/images.ts"
   },
   "dependencies": {
-    "@preact/signals": "^2.11.2",
     "boardgame.io": "^0.50.2",
     "markdown-it": "^15.0.2",
     "markdown-it-anchor": "^10.0.0",
     "markdown-it-attrs": "^5.0.1",
     "markdown-it-footnote": "^4.0.0",
-    "preact": "^11.0.0-rc.2"
+    "preact": "^11.0.0"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.6",
+    "@preact/signals": "^2.11.3",
     "@types/node": "^26.6.3",
-    "animejs": "4.5.0",
     "bootstrap": "5.3.8",
     "npm-run-all2": "^9.0.3",
     "sass": "1.78.0",
     "sharp": "^0.35.5",
     "typescript": "~7.0.2",
-    "vite": "^8.3.1"
+    "vite": "^8.3.2"
   },
   "allowScripts": {
     "fsevents@2.3.3": true,

@@ -1,11 +1,17 @@
 // Copyright (c) 2026 @SilvinoR
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-import { StateMain, type GameMode } from '../types/game-state.d';
+import { StateMain } from '../types/game-state.d';
 import { gameEngine } from './main-loop';
-import { GameModeGameState } from './state-game-mode';
-import { HelpScreen } from './state-help';
+import { GameModeGameState, type GameModeSelection } from './state-mode';
+import { SelectDealerGameState /* , type DealerSelectionAction */ } from './state-dealer';
 import { SettingsScreen } from './state-settings';
+import { HelpScreen } from './state-help';
+import { logger } from './logger';
+import { i18n } from './i18n';
+import { 
+  ACTION_QUIT
+} from './constants';
 
 interface TooltipInstance {
   hide(): void;
@@ -22,7 +28,7 @@ interface TooltipPlugin {
  * would normally hide it, so the tooltip popup is orphaned in <body>.
  * Every reaction below disposes tooltips first so no action can leak one.
  */
-function disposeStuckTooltips(): void {
+function clearTooltips(): void {
   const Tooltip = (window as Window & { bootstrap?: { Tooltip?: TooltipPlugin } }).bootstrap?.Tooltip;
   if (!Tooltip) return;
 
@@ -31,29 +37,42 @@ function disposeStuckTooltips(): void {
   });
 }
 
-export function gameModeSubmit(mode: GameMode): void {
-  disposeStuckTooltips();
-  const node = gameEngine.activeNode;
-  if (node instanceof GameModeGameState) node.trigger(mode);
+export function gameModeSubmit(selection: GameModeSelection): void {
+  logger.info(`gameModeSubmit:${selection}`);
+  clearTooltips();
+  const node = gameEngine.node;
+  logger.info(`node = ${node}`);
+  if (node instanceof GameModeGameState) node.trigger(selection);
 }
 
 export function settingsClick(): void {
-  disposeStuckTooltips();
+  logger.info('settingsClick');
+  clearTooltips();
   gameEngine.openOverlay(StateMain.SETTINGS);
 }
 
 export function helpClick(): void {
-  disposeStuckTooltips();
+  logger.info('helpClick');
+  clearTooltips();
   gameEngine.openOverlay(StateMain.HELP);
 }
 
 export function closeClick(): void {
-  disposeStuckTooltips();
-  const node = gameEngine.activeNode;
-  if (node instanceof SettingsScreen || node instanceof HelpScreen) node.trigger();
+  logger.info('closeClick');
+  clearTooltips();
+  const node = gameEngine.node;
+  if (node instanceof SettingsScreen || node instanceof HelpScreen) node.trigger(undefined);
 }
 
 export function quitClick(): void {
-  disposeStuckTooltips();
-  // TODO
+  logger.info('quitClick');
+  clearTooltips();
+
+  // FIXME : Make this a SpeechBubble interaction
+  if (!window.confirm(i18n.t('reactions:confirm-quit'))) return;
+
+  const node = gameEngine.node;
+  if (node instanceof SelectDealerGameState) {
+    node.trigger({ action: ACTION_QUIT, nextState: StateMain.GAME_MODE });
+  }
 }

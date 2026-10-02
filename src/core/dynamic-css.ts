@@ -47,3 +47,15 @@ export function applyTableColorClass(color: string): void {
 export function applyTableTextureClass(texture: string): void {
   applyDynamicClass('app-dynamic-table-texture', `.bg-${texture}`, '.bg-texture');
 }
+
+/** Sets the card height for the current playing surface. */
+export function applyPlayingCardHeight(height: number): void {
+  let styleElement = document.getElementById('app-dynamic-playing-card') as HTMLStyleElement | null;
+  if (!styleElement) {
+    styleElement = document.createElement('style');
+    styleElement.id = 'app-dynamic-playing-card';
+    document.head.appendChild(styleElement);
+  }
+
+  styleElement.textContent = `.playing-card { height: ${height}px }`;
+}

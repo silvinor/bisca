@@ -6,7 +6,7 @@ import { useEffect, useState } from 'preact/hooks';
 import { deckBackUrl, deckPreviewUrl, loadDeckCatalog, type DeckCatalogEntry } from '../core/deck-catalog';
 import { i18n } from '../core/i18n';
 import { persistence } from '../core/persistence';
-import { closeClick } from '../core/reactions';
+import { closeClick, helpClick } from '../core/reactions';
 import { applyTableColorClass, applyTableTextureClass } from '../core/dynamic-css';
 import {
   SAVE_GROUP_OPTION,
@@ -17,8 +17,32 @@ import {
   SAVE_TEN_CARD,
   SAVE_COURT_CARD_POINTS,
   SAVE_SCORE_KEEPING,
+  DEFAULT_GAME_DECK_NAME,
+  DEFAULT_CARD_BACK,
+  DEFAULT_TABLE_COLOR,
+  DEFAULT_TABLE_TEXTURE,
+  DEFAULT_TEN_CARD,
+  DEFAULT_COURT_CARD_POINTS,
+  DEFAULT_SCORE_KEEPING,
 } from '../core/constants';
 import { RadioImages, type RadioImagesLayerClasses } from './radio-images';
+import { 
+  getGameDeckName, 
+  setGameDeckName,
+  getCardBack,
+  setCardBack,
+  getTenCard,
+  setTenCard,
+  getTableColor,
+  setTableColor,
+  getTableTexture,
+  setTableTexture,
+  getCourtCardPoints,
+  setCourtCardPoints,
+  getScoreKeeping,
+  setScoreKeeping,
+  resetCardCache,
+} from '../core/deck-handler';
 import {
   COURT_CARD_POINTS_Q2J3,
   COURT_CARD_POINTS_J2Q3,
@@ -76,23 +100,23 @@ const TABLE_TEXTURES: readonly { id: TableTexture; labelKey: string; description
   { id: TABLE_TEXTURE_DIGITAL, labelKey: 'state-settings:table-texture-digital', descriptionKey: 'state-settings:table-texture-digital-description', classes: ['bg-color', '', '', 'bg-digital'] },
 ] as const;
 
-const DEFAULT_OPTIONS = {
-  gameDeck: 'default',
-  cardBack: 'a',
-  tableColor: TABLE_COLOR_GREEN,
-  tableTexture: TABLE_TEXTURE_FELT,
-  tenCard: TEN_CARD_SEVEN,
-  courtCardPoints: COURT_CARD_POINTS_Q2J3,
-  scoreKeeping: SCORE_KEEPING_COMBS,
-} as const satisfies {
-  gameDeck: string;
-  cardBack: string;
-  tableColor: TableColor;
-  tableTexture: TableTexture;
-  tenCard: TenCard;
-  courtCardPoints: CourtCardPoints;
-  scoreKeeping: ScoreKeeping;
-};
+// const DEFAULT_OPTIONS = {
+//   gameDeck: DEFAULT_GAME_DECK,
+//   cardBack: DEFAULT_CARD_BACK,
+//   tableColor: DEFAULT_TABLE_COLOR,
+//   tableTexture: DEFAULT_TABLE_TEXTURE,
+//   tenCard: DEFAULT_TEN_CARD,
+//   courtCardPoints: DEFAULT_COURT_CARD_POINTS,
+//   scoreKeeping: DEFAULT_SCORE_KEEPING,
+// } as const satisfies {
+//   gameDeck: string;
+//   cardBack: string;
+//   tableColor: TableColor;
+//   tableTexture: TableTexture;
+//   tenCard: TenCard;
+//   courtCardPoints: CourtCardPoints;
+//   scoreKeeping: ScoreKeeping;
+// };
 
 /** Card backs are lettered files ('a', 'b', ...) up to a deck's declared count. */
 function cardBackIds(count: number): string[] {
@@ -106,12 +130,6 @@ function validOption<T extends string>(
   defaultValue: T,
 ): T {
   return options.find((option) => option.id === value)?.id ?? defaultValue;
-}
-
-function saveOption(name: string, value: string): void {
-  void persistence.set(SAVE_GROUP_OPTION, name, value).catch((error: unknown) => {
-    console.error(`[Persistence] Failed to save option ${name}:`, error);
-  });
 }
 
 /** Separates the leading label text and any "(...)" qualifier, e.g. "7 (Default)". */
@@ -204,16 +222,16 @@ function onEscapeKeyDown(event: KeyboardEvent): void {
 }
 
 export function StateSettings() {
-  const [gameDeck, setGameDeck] = useState<string>(DEFAULT_OPTIONS.gameDeck);
-  const [cardBack, setCardBack] = useState<string>(DEFAULT_OPTIONS.cardBack);
-  const [tableColor, setTableColor] = useState<TableColor>(DEFAULT_OPTIONS.tableColor);
-  const [tableTexture, setTableTexture] = useState<TableTexture>(DEFAULT_OPTIONS.tableTexture);
-  const [tenCard, setTenCard] = useState<TenCard>(DEFAULT_OPTIONS.tenCard);
-  const [courtCardPoints, setCourtCardPoints] = useState<CourtCardPoints>(DEFAULT_OPTIONS.courtCardPoints);
-  const [scoreKeeping, setScoreKeeping] = useState<ScoreKeeping>(DEFAULT_OPTIONS.scoreKeeping);
-  const [optionsLoaded, setOptionsLoaded] = useState(false);
-  const [decks, setDecks] = useState<DeckCatalogEntry[]>([]);
-  const [deckCatalogError, setDeckCatalogError] = useState(false);
+  const [gameDeck, _setGameDeckName] = useState<string>(DEFAULT_GAME_DECK_NAME);
+  const [cardBack, _setCardBack] = useState<string>(DEFAULT_CARD_BACK);
+  const [tableColor, _setTableColor] = useState<TableColor>(DEFAULT_TABLE_COLOR);
+  const [tableTexture, _setTableTexture] = useState<TableTexture>(DEFAULT_TABLE_TEXTURE);
+  const [tenCard, _setTenCard] = useState<TenCard>(DEFAULT_TEN_CARD);
+  const [courtCardPoints, _setCourtCardPoints] = useState<CourtCardPoints>(DEFAULT_COURT_CARD_POINTS);
+  const [scoreKeeping, _setScoreKeeping] = useState<ScoreKeeping>(DEFAULT_SCORE_KEEPING);
+  const [optionsLoaded, _setOptionsLoaded] = useState(false);
+  const [decks, _setDecks] = useState<DeckCatalogEntry[]>([]);
+  const [deckCatalogError, _setDeckCatalogError] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -221,52 +239,33 @@ export function StateSettings() {
     // Load each value after the prior read creates or opens the shared store.
     const loadOptions = async () => {
       try {
-        const storedGameDeck = await persistence.get(SAVE_GROUP_OPTION, SAVE_GAME_DECK, DEFAULT_OPTIONS.gameDeck);
-        // Card backs are remembered per deck, under a compounded key
-        // ("card-back-gilded"), so switching decks and back restores each
-        // deck's own last pick instead of sharing one back across all decks.
-        const storedCardBack = await persistence.get(
-          SAVE_GROUP_OPTION,
-          `${SAVE_CARD_BACK}-${storedGameDeck}`,
-          DEFAULT_OPTIONS.cardBack,
-        );
-        const storedTableColor = await persistence.get(SAVE_GROUP_OPTION, SAVE_TABLE_COLOR, DEFAULT_OPTIONS.tableColor);
-        const storedTableTexture = await persistence.get(
-          SAVE_GROUP_OPTION,
-          SAVE_TABLE_TEXTURE,
-          DEFAULT_OPTIONS.tableTexture,
-        );
-        const storedTenCard = await persistence.get(SAVE_GROUP_OPTION, SAVE_TEN_CARD, DEFAULT_OPTIONS.tenCard);
-        const storedCourtCardPoints = await persistence.get(
-          SAVE_GROUP_OPTION,
-          SAVE_COURT_CARD_POINTS,
-          DEFAULT_OPTIONS.courtCardPoints,
-        );
-        const storedScoreKeeping = await persistence.get(
-          SAVE_GROUP_OPTION,
-          SAVE_SCORE_KEEPING,
-          DEFAULT_OPTIONS.scoreKeeping,
-        );
+        const storedGameDeckName = await getGameDeckName();
+        const storedCardBack = await getCardBack();
+        const storedTableColor = await getTableColor();
+        const storedTableTexture = await getTableTexture();
+        const storedTenCard = await getTenCard();
+        const storedCourtCardPoints = await getCourtCardPoints();
+        const storedScoreKeeping = await getScoreKeeping();
         if (!active) return;
 
         // Validate stored data before publishing the loaded state. The stored
         // deck id and card back are checked once the deck catalog itself has
         // loaded, below.
-        setGameDeck(storedGameDeck);
-        setCardBack(storedCardBack);
-        const loadedTableColor = validOption(storedTableColor, TABLE_COLORS, DEFAULT_OPTIONS.tableColor);
-        setTableColor(loadedTableColor);
+        _setGameDeckName(storedGameDeckName);
+        _setCardBack(storedCardBack);
+        const loadedTableColor = validOption(storedTableColor, TABLE_COLORS, DEFAULT_TABLE_COLOR);
+        _setTableColor(loadedTableColor);
         applyTableColorClass(loadedTableColor);
-        const loadedTableTexture = validOption(storedTableTexture, TABLE_TEXTURES, DEFAULT_OPTIONS.tableTexture);
-        setTableTexture(loadedTableTexture);
+        const loadedTableTexture = validOption(storedTableTexture, TABLE_TEXTURES, DEFAULT_TABLE_TEXTURE);
+        _setTableTexture(loadedTableTexture);
         applyTableTextureClass(loadedTableTexture);
-        setTenCard(validOption(storedTenCard, TEN_CARDS, DEFAULT_OPTIONS.tenCard));
-        setCourtCardPoints(validOption(storedCourtCardPoints, COURT_CARD_POINTS, DEFAULT_OPTIONS.courtCardPoints));
-        setScoreKeeping(validOption(storedScoreKeeping, SCORE_KEEPINGS, DEFAULT_OPTIONS.scoreKeeping));
+        _setTenCard(validOption(storedTenCard, TEN_CARDS, DEFAULT_TEN_CARD));
+        _setCourtCardPoints(validOption(storedCourtCardPoints, COURT_CARD_POINTS, DEFAULT_COURT_CARD_POINTS));
+        _setScoreKeeping(validOption(storedScoreKeeping, SCORE_KEEPINGS, DEFAULT_SCORE_KEEPING));
       } catch (error: unknown) {
         console.error('[Persistence] Failed to load settings options:', error);
       } finally {
-        if (active) setOptionsLoaded(true);
+        if (active) _setOptionsLoaded(true);
       }
     };
 
@@ -284,25 +283,27 @@ export function StateSettings() {
   useEffect(() => {
     const controller = new AbortController();
     loadDeckCatalog(controller.signal)
-      .then(setDecks)
+      .then(_setDecks)
       .catch(() => {
-        if (!controller.signal.aborted) setDeckCatalogError(true);
+        if (!controller.signal.aborted) _setDeckCatalogError(true);
       });
     return () => controller.abort();
   }, []);
 
   const changeGameDeck = (next: string) => {
-    setGameDeck(next);
-    saveOption(SAVE_GAME_DECK, next);
+    _setGameDeckName(next); // internal
+    setGameDeckName(next); // persist
 
     // Restore whichever back was last picked for this specific deck; the
     // fallback-correction effect below fixes it up once the catalog confirms
     // that deck's actual back count.
-    void persistence.get(SAVE_GROUP_OPTION, `${SAVE_CARD_BACK}-${next}`, DEFAULT_OPTIONS.cardBack)
-      .then(setCardBack)
+    void persistence.get(SAVE_GROUP_OPTION, `${SAVE_CARD_BACK}-${next}`, DEFAULT_CARD_BACK)
+      .then(_setCardBack)
       .catch((error: unknown) => {
         console.error('[Persistence] Failed to load card back for deck:', error);
       });
+
+    resetCardCache();
   };
 
   // Once the catalog arrives, a stored deck id it no longer lists (removed,
@@ -317,43 +318,46 @@ export function StateSettings() {
   const availableCardBacks = selectedDeckDetails ? cardBackIds(selectedDeckDetails.backs) : [];
 
   const changeCardBack = (next: string) => {
-    setCardBack(next);
-    saveOption(`${SAVE_CARD_BACK}-${gameDeck}`, next);
+    _setCardBack(next);
+    setCardBack(next, gameDeck);
+    resetCardCache();
   };
 
   // A card back that the now-selected deck doesn't offer (deck just changed,
   // or the stored back is stale) falls back to that deck's first back.
   useEffect(() => {
     if (selectedDeckDetails && !availableCardBacks.includes(cardBack)) {
-      changeCardBack(availableCardBacks[0] ?? DEFAULT_OPTIONS.cardBack);
+      changeCardBack(availableCardBacks[0] ?? DEFAULT_CARD_BACK);
     }
   }, [selectedDeckDetails, cardBack]);
 
   const changeTableColor = (next: TableColor) => {
+    _setTableColor(next);
     setTableColor(next);
     applyTableColorClass(next);
-    saveOption(SAVE_TABLE_COLOR, next);
   };
 
   const changeTableTexture = (next: TableTexture) => {
+    _setTableTexture(next);
     setTableTexture(next);
     applyTableTextureClass(next);
-    saveOption(SAVE_TABLE_TEXTURE, next);
   };
 
   const changeTenCard = (next: TenCard) => {
+    _setTenCard(next);
     setTenCard(next);
-    saveOption(SAVE_TEN_CARD, next);
+    resetCardCache();
   };
 
   const changeCourtCardPoints = (next: CourtCardPoints) => {
+    _setCourtCardPoints(next);
     setCourtCardPoints(next);
-    saveOption(SAVE_COURT_CARD_POINTS, next);
+    resetCardCache();
   };
 
   const changeScoreKeeping = (next: ScoreKeeping) => {
+    _setScoreKeeping(next);
     setScoreKeeping(next);
-    saveOption(SAVE_SCORE_KEEPING, next);
   };
 
   return (
@@ -396,6 +400,7 @@ export function StateSettings() {
                           id: deck.id,
                           label: deck.label,
                           description: deck.description,
+                          hint: deck.label,
                           image: deckPreviewUrl(deck.id),
                           classes: ['bg-color bg-texture', '', '', ''] as RadioImagesLayerClasses,
                         }))}
@@ -436,6 +441,7 @@ export function StateSettings() {
                         id: option.id,
                         label: i18n.t(option.labelKey),
                         description: i18n.t(option.descriptionKey),
+                        hint: i18n.t(option.labelKey),
                         classes: option.classes,
                       }))}
                     />
@@ -454,6 +460,7 @@ export function StateSettings() {
                         id: option.id,
                         label: i18n.t(option.labelKey),
                         description: i18n.t(option.descriptionKey),
+                        hint: i18n.t(option.labelKey),
                         classes: option.classes,
                       }))}
                     />
@@ -512,6 +519,9 @@ export function StateSettings() {
               )}
             </div>
             <div className='modal-footer'>
+              <button type='button' className='btn btn-info' onClick={helpClick}>
+                <i class='fa-solid'>?</i>
+              </button>
               <button type='button' className='btn btn-secondary' onClick={closeClick}>
                 <i class="fa-solid me-1">&#120;</i>
                 {i18n.t('app:close')}

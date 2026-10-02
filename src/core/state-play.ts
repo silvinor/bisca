@@ -11,20 +11,25 @@ export class PlayGameState extends GameState<StateMain> {
   }
 
   protected init(): void {
-    logger.debug('Game State --> PLAY --> Init');
+    logger.debug('PLAY --> Init');
   }
 
-  protected tick(lastState: StateMain): StateMain {
-    logger.debug('Tick --> PLAY');
-    // TODO: transition once this node has a real trigger to react to.
-    return lastState;
+  protected tick(): void {
+    logger.debug('PLAY --> Tick');
   }
 
   protected draw(): void {
-    logger.debug('Draw --> PLAY');
+    logger.debug('PLAY --> Draw');
   }
 
+  protected tock(): StateMain {
+    logger.debug('PLAY --> Tock');
+    // TODO: transition once this node has a real trigger to react to.
+    return this.currentState;
+  }
+  
+
   protected end(): void {
-    logger.debug('Game State --> PLAY --> End');
+    logger.debug('PLAY --> End');
   }
 }

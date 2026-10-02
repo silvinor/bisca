@@ -1,6 +1,8 @@
 // Copyright (c) 2026 @SilvinoR
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
+import { logger } from "./logger";
+
 /**
  * Shared lifecycle for the main loop and its individual state engines.
  *
@@ -31,6 +33,7 @@ export abstract class GameState<State, TriggerPayload = void> {
   }
 
   public start(): void {
+    logger.info(`start:${this.currentState}`)
     if (this.running) return;
     this.running = true;
     this.init();
@@ -38,25 +41,26 @@ export abstract class GameState<State, TriggerPayload = void> {
 
   public async step(): Promise<State> {
     if (!this.running) return this.currentState;
-    // Runs the documented cycle in place: tick (non-UI work), then draw (DOM
-    // work), then block for the next trigger. This repeats until tick()
-    // reports a different state, which is the signal that this node is done
-    // and control should return to the caller.
-    while (this.running) {
-      const before = this.currentState;
-      this.currentState = await this.tick(before);
+
+    // Runs the documented cycle in place: tick (non-UI step setup), then draw (DOM
+    // work), then block for the next trigger, then tock (non-UI step cleanup).
+    // This repeats until tock() reports a different state, which is the signal
+    // that this node is done and control should return to the caller.
+    const initialState = this.currentState;
+    while (this.running && this.currentState === initialState && this.currentState != null) {
+      await this.tick();
+      if (!this.running) break;
+
       // Each trigger is consumed by exactly one tick() pass.
-      this.lastTrigger = undefined;
-      this.triggered = false;
-      this.render();
-      if (!this.running || this.currentState !== before) break;
+      this.resetTrigger();
+      await this.draw();
       await this.waitForTrigger();
+      if (!this.running) break;
+
+      this.currentState = await this.tock();
+      if (!this.running) break;
     }
     return this.currentState;
-  }
-
-  public render(): void {
-    if (this.running) this.draw(this.currentState);
   }
 
   public async frame(): Promise<void> {
@@ -86,14 +90,23 @@ export abstract class GameState<State, TriggerPayload = void> {
     this.resolveTrigger = null;
   }
 
+  protected resetTrigger(): void {
+    this.lastTrigger = undefined;
+    this.triggered = false;
+  }
+
   private waitForTrigger(): Promise<void> {
+    // A draw step can trigger before this resolver exists.
+    if (this.triggered) return Promise.resolve();
+
     return new Promise((resolve) => {
       this.resolveTrigger = resolve;
     });
   }
 
   protected abstract init(): void;
-  protected abstract tick(lastState: State): State | Promise<State>;
-  protected abstract draw(currentState: State): void;
+  protected abstract tick(): void | Promise<void>; // what needs to be done before draw
+  protected abstract draw(): void | Promise<void>; // what needs to be done for drawing
+  protected abstract tock(): State | Promise<State>; // what needs to be done after draw, e.g. progress, set next state
   protected abstract end(): void;
 }

@@ -14,14 +14,19 @@ export class WinLoseGameState extends GameState<StateMain> {
     logger.debug('Game State --> WIN_LOSE --> Init');
   }
 
-  protected tick(lastState: StateMain): StateMain {
+  protected tick(): void {
     logger.debug('Tick --> WIN_LOSE');
-    // TODO: transition once this node has a real trigger to react to.
-    return lastState;
+    // ... do nothing ...
   }
 
   protected draw(): void {
     logger.debug('Draw --> WIN_LOSE');
+  }
+
+  protected tock(): StateMain {
+    logger.debug('Tock --> WIN_LOSE');
+    // TODO: transition once this node has a real trigger to react to.
+    return this.currentState;
   }
 
   protected end(): void {

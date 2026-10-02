@@ -19,18 +19,16 @@ export class HelpScreen extends GameState<StateMain> {
     this.loaded = false;
   }
 
-  protected tick(lastState: StateMain): StateMain {
+  protected tick(): void {
     logger.debug('HELP --> Tick');
-    // reactions.ts's closeClick() calls trigger() on this node; once fired,
-    // resume whichever node this overlay interrupted.
-    return this.triggered ? StateMain.RESUME : lastState;
+    // ... do nothing ...
   }
 
   protected draw(): void {
     logger.debug('HELP --> Draw');
 
     if (!this.loaded) {
-      const appMain = document.getElementById('app_main');
+      const appMain = document.getElementById('app-main');
       if (!appMain) return;
 
       render(h(StateHelp, {}), appMain);
@@ -38,9 +36,16 @@ export class HelpScreen extends GameState<StateMain> {
     }
   }
 
+  protected tock(): StateMain {
+    logger.debug('HELP --> Tock');
+    // reactions.ts's closeClick() calls trigger() on this node; once fired,
+    // resume whichever node this overlay interrupted.
+    return this.triggered ? StateMain.RESUME : this.currentState;
+  }
+
   protected end(): void {
     logger.debug('HELP --> End');
-    const appMain = document.getElementById('app_main');
+    const appMain = document.getElementById('app-main');
     if (appMain) render(null, appMain);
     this.loaded = false;
   }

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 import { h, type ComponentChildren } from 'preact';
-import { SPEECH_BUBBLE_AVATAR_PATH } from '../core/constants';
+import { APP_SPEECH_BUBBLE_AVATAR_FILE } from '../core/constants';
 
 interface SpeechBubbleProps {
   children: ComponentChildren;
@@ -13,7 +13,7 @@ interface SpeechBubbleProps {
 export function SpeechBubble({
   children,
   avatarAlt,
-  avatarSrc = SPEECH_BUBBLE_AVATAR_PATH,
+  avatarSrc = APP_SPEECH_BUBBLE_AVATAR_FILE,
 }: SpeechBubbleProps) {
   return h(
     'div',

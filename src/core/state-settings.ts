@@ -19,28 +19,29 @@ export class SettingsScreen extends GameState<StateMain> {
     this.loaded = false;
   }
 
-  protected tick(lastState: StateMain): StateMain {
+  protected tick(): void {
     logger.debug('SETTINGS --> Tick');
-    // reactions.ts's closeClick() calls trigger() on this node; once fired,
-    // resume whichever node this overlay interrupted.
-    return this.triggered ? StateMain.RESUME : lastState;
+    // ... do nothing ...
   }
 
   protected draw(): void {
     logger.debug('SETTINGS --> Draw');
-
     if (!this.loaded) {
-      const appMain = document.getElementById('app_main');
+      const appMain = document.getElementById('app-main');
       if (!appMain) return;
-
       render(h(StateSettings, {}), appMain);
       this.loaded = true;
     }
   }
 
+  protected tock(): StateMain {
+    logger.debug('SETTINGS --> Tock');
+    return this.triggered ? StateMain.RESUME : this.currentState;
+  }
+
   protected end(): void {
     logger.debug('SETTINGS --> End');
-    const appMain = document.getElementById('app_main');
+    const appMain = document.getElementById('app-main');
     if (appMain) render(null, appMain);
     this.loaded = false;
   }

@@ -5,14 +5,12 @@ import { StateMain, TABLE_COLOR_GREEN, TABLE_TEXTURE_FELT } from '../types/game-
 import { GameState } from './game-state';
 import { logger } from './logger';
 import { persistence } from './persistence';
+import { loadGameProgress } from './game-common';
 import { applyTableColorClass, applyTableTextureClass } from './dynamic-css';
 import {
   SAVE_GROUP_OPTION,
-  SAVE_PROGRESS,
-  SAVE_PROGRESS_TIMESTAMP,
   SAVE_TABLE_COLOR,
   SAVE_TABLE_TEXTURE,
-  REFRESH_RESET_TIMEOUT,
 } from './constants';
 
 export class InitGameState extends GameState<StateMain> {
@@ -24,9 +22,9 @@ export class InitGameState extends GameState<StateMain> {
     // logger.debug('INIT --> init');
   }
 
-  protected async tick(): Promise<StateMain> {
+  protected tick(): void {
     // logger.debug('INIT --> Tick');
-
+    
     // Best-effort and non-blocking: themes the table as soon as possible
     // without delaying the progress-based routing decision below.
     void persistence.get(SAVE_GROUP_OPTION, SAVE_TABLE_COLOR, TABLE_COLOR_GREEN)
@@ -39,30 +37,22 @@ export class InitGameState extends GameState<StateMain> {
       .catch((error: unknown) => {
         logger.warn('[Persistence] Failed to load table texture:', error);
       });
-
-    // Read saved progress, then use the splash screen for missing, unknown,
-    // or stale (older than REFRESH_RESET_TIMEOUT) progress.
-    let [progress, savedAt] = await Promise.all([
-      persistence.get(SAVE_GROUP_OPTION, SAVE_PROGRESS),
-      persistence.get(SAVE_GROUP_OPTION, SAVE_PROGRESS_TIMESTAMP),
-    ]).catch((error: unknown): [string, string] => {
-      logger.warn('[Persistence] Failed to load game progress:', error);
-      return ['', ''];
-    });
-
-    const isFresh = Date.now() - Number(savedAt || 0) < (REFRESH_RESET_TIMEOUT  * 1000);
-    if (!isFresh) progress = '';
-
-    switch (progress) {
-      case 'mode':
-        return StateMain.GAME_MODE;
-      default:
-        return StateMain.SPLASH;
-    }
   }
 
   protected draw(): void {
     // logger.debug('INIT --> Draw');
+    this.trigger(undefined);
+  }
+
+  protected async tock(): Promise<StateMain> {
+    // Use the splash screen for missing, unknown, or stale progress.
+    const progress = await loadGameProgress();
+
+    if ((progress == StateMain.GAME_MODE) || (progress == StateMain.SELECT_DEALER)) {
+      return progress;
+    } else {
+      return StateMain.SPLASH;
+    }
   }
 
   protected end(): void {

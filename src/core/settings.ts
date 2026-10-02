@@ -19,7 +19,7 @@ const libraries = [
   "bootstrap",
   "fontawesome",
   "fonts",
-  "animejs",
+  // "animejs",
   "boardgameio"
 ] as const;
 

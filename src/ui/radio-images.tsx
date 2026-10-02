@@ -16,6 +16,7 @@ export interface RadioImagesOption<T extends string> {
   image?: string;
   classes?: RadioImagesLayerClasses;
   description?: string;
+  hint?: boolean | string;
   disabled?: boolean;
 }
 
@@ -62,6 +63,9 @@ export function RadioImages<T extends string>({
           const inputId = `radio-${safeHtmlIdPart(name)}-${safeHtmlIdPart(option.id)}`;
           const isSelected = option.id === value;
           const isFocused = option.id === focusedOptionId;
+          const tooltip = option.hint === true
+            ? option.description
+            : typeof option.hint === 'string' ? option.hint : undefined;
 
           return (
             <span
@@ -85,6 +89,11 @@ export function RadioImages<T extends string>({
                 className='radio-images-button'
                 htmlFor={inputId}
                 style={{ position: 'relative' }}
+                {...tooltip && {
+                  'data-bs-toggle': 'tooltip',
+                  'data-bs-placement': 'top',
+                  'data-bs-title': tooltip,
+                }}
               >
                 <svg
                   className={`radio-images-bg ${option.classes?.[0] ?? ''}`.trim()}
