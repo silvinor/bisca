@@ -1,0 +1,68 @@
+/*
+ * Roobert — designed by Martin Vácha for Display Type Foundry s.r.o.
+ * Version 4.006.
+ */
+
+@font-face {
+  font-family: "Roobert";
+  src:
+    url("Roobert.woff2") format("woff2"),
+    url("Roobert.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Roobert";
+  src:
+    url("RoobertItalics.woff2") format("woff2"),
+    url("RoobertItalics.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 100 900;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Roobert Fallback";
+  src: local("Arial");
+  font-weight: 100 900;
+  font-style: normal;
+  ascent-override: 92.23%;
+  descent-override: 23.88%;
+  line-gap-override: 0%;
+  size-adjust: 103.01%;
+}
+
+.font-roobert {
+  font-family: "Roobert", "Roobert Fallback", sans-serif;
+}
+
+@font-face {
+  font-family: "Roobert Mono";
+  src:
+    url("RoobertMono.woff2") format("woff2"),
+    url("RoobertMono.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Roobert Mono";
+  src:
+    url("RoobertMonoItalics.woff2") format("woff2"),
+    url("RoobertMonoItalics.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 100 900;
+  font-style: italic;
+}
+
+.font-roobert-mono {
+  font-family: "Roobert Mono", ui-monospace, monospace;
+}
+
+:root {
+  --font-roobert: "Roobert", "Roobert Fallback", sans-serif;
+  --font-roobert-mono: "Roobert Mono", ui-monospace, monospace;
+}

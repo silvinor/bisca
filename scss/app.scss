@@ -11,10 +11,17 @@
 @import "../node_modules/bootstrap/scss/maps";
 @import "../node_modules/bootstrap/scss/mixins";
 @import "variables";
+
+// @import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Google+Sans+Code:ital,wght,MONO@0,300..800,1;1,300..800,1&display=swap');
+@import url('/assets/fnt/Roobert.css');
 @import url('/assets/fnt/Excalifont.css');
 
 :root {
-  --app-user-font: "Excalifont", cursive;
+  // --#{$prefix}font-sans-serif: 'Google Sans', #{inspect($font-family-sans-serif)};
+  // --#{$prefix}font-monospace: 'Google Sans Code', #{inspect($font-family-monospace)};
+  --#{$prefix}font-sans-serif: 'Roobert', #{inspect($font-family-sans-serif)};
+  --#{$prefix}font-monospace: 'Roobert Mono', #{inspect($font-family-monospace)};
+  --#{$prefix}font-serif: 'Excalifont', cursive, serif;
 }
 
 // ---------- DEBUG -----------
@@ -61,12 +68,6 @@
   min-width: 2rem;
   opacity: .75;
 }
-
-$table-green: #096;
-$table-red: #C50;
-$table-blue: #069;
-$table-ebony: #555;
-$table-purple: #A7C;
 
 .bg-green { background-color: $table-green; }
 .bg-red { background-color: $table-red; }
@@ -134,7 +135,7 @@ $table-purple: #A7C;
     transition: border-color .15s ease, border-width .15s ease, box-shadow .15s ease;
 
     &:hover {
-      border-color: var(--bs-primary);
+      border-color: var(--#{$prefix}primary);
       border-width: .125rem;
     }
 
@@ -150,7 +151,7 @@ $table-purple: #A7C;
 
   .btn-check:checked + .radio-images-button {
     border-width: .25rem;
-    // border-color: var(--bs-primary);
+    // border-color: var(--#{$prefix}primary);
     @if $enable-shadows {
       @include box-shadow($focus-ring-box-shadow);
     } @else {
@@ -163,8 +164,8 @@ $table-purple: #A7C;
   }
 
   .btn-check:focus-visible + .radio-images-button {
-    border-color: var(--bs-primary);
-    box-shadow: 0 0 0 var(--bs-focus-ring-width) var(--bs-focus-ring-color);
+    border-color: var(--#{$prefix}primary);
+    box-shadow: 0 0 0 var(--#{$prefix}bs-focus-ring-width) var(--#{$prefix}focus-ring-color);
   }
 
   .btn-check:disabled + .radio-images-button {
@@ -268,9 +269,18 @@ $table-purple: #A7C;
     max-width: 100%;
     padding: .75em 1em;
     font-size: clamp($font-size-sm, 2vw, $font-size-lg);
-    font-family: var(--app-user-font);
+    font-family: var(--#{$prefix}font-serif);
     line-height: $line-height-sm;
-    
+  }
+
+  // The bubble ignores pointer events so it never blocks the table, but a prompt needs its buttons clickable.
+  &.speech-bubble-prompt .speech-bubble-content {
+    pointer-events: auto;
+  }
+
+  .speech-bubble-buttons {
+    margin-top: .75em;
+    font-family: var(--#{$prefix}font-sans-serif);
   }
 }
 
@@ -279,7 +289,7 @@ $table-purple: #A7C;
 // ----- Radio Images -----
 
 .form-text {
-  font-family: var(--app-user-font);
+  font-family: var(--#{$prefix}font-serif);
 }
 
 // ---------- Help Screen ----------
