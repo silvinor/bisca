@@ -297,11 +297,8 @@ export function StateSettings() {
     // Restore whichever back was last picked for this specific deck; the
     // fallback-correction effect below fixes it up once the catalog confirms
     // that deck's actual back count.
-    void persistence.get(SAVE_GROUP_OPTION, `${SAVE_CARD_BACK}-${next}`, DEFAULT_CARD_BACK)
-      .then(_setCardBack)
-      .catch((error: unknown) => {
-        console.error('[Persistence] Failed to load card back for deck:', error);
-      });
+    const cardBack: string = persistence.get(SAVE_GROUP_OPTION, `${SAVE_CARD_BACK}-${next}`, DEFAULT_CARD_BACK);
+    _setCardBack(cardBack);
 
     resetCardCache();
   };
@@ -522,9 +519,9 @@ export function StateSettings() {
               <button type='button' className='btn btn-info' onClick={helpClick}>
                 <i class='fa-solid'>?</i>
               </button>
-              <button type='button' className='btn btn-secondary' onClick={closeClick}>
-                <i class="fa-solid me-1">&#120;</i>
-                {i18n.t('app:close')}
+              <button type='button' className='btn btn-primary' onClick={closeClick}>
+                <i class="fa-solid me-1">&#x2713;</i>
+                {i18n.t('app:done')}
               </button>
             </div>
           </div>

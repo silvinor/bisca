@@ -14,6 +14,7 @@ import {
 
 // general items
 export const APP_COPYRIGHT_HOLDER = "@SilvinoR";
+export const APP_SPEECH_BUBBLE_DELAY = 5000;
 
 // file paths
 export const APP_LANGUAGE_PATH = '/lang';

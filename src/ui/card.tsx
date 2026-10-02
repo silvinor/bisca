@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 import type { CSSProperties } from 'preact';
-import { useEffect, useState } from 'preact/hooks';
 import { getBackFaceUrl, getCardFaceUrl } from '../core/deck-handler';
 
 /* ----- Card Face ----- */
@@ -14,16 +13,7 @@ interface CardFaceProps {
 }
 
 export function CardFace({ letter, style, onClick }: CardFaceProps) {
-  const [src, setSrc] = useState('');
-
-  useEffect(() => {
-    setSrc('');
-    void getCardFaceUrl(letter)
-      .then(setSrc)
-      .catch((error: unknown) => console.error('[Card face] Failed to load image:', error));
-  }, [letter]);
-
-  if (!src) return null;
+  const src = getCardFaceUrl(letter);
 
   if (!onClick) {
     return (
@@ -62,15 +52,7 @@ interface CardBackProps {
 }
 
 export function CardBack({ style, onClick }: CardBackProps) {
-  const [src, setSrc] = useState('');
-
-  useEffect(() => {
-    void getBackFaceUrl()
-      .then(setSrc)
-      .catch((error: unknown) => console.error('[Card back] Failed to load image:', error));
-  }, []);
-
-  if (!src) return null;
+  const src = getBackFaceUrl();
 
   if (!onClick) {
     return (

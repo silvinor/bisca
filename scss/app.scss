@@ -45,6 +45,7 @@
   // footer { outline: 1px dashed blue; }
 
   .debug-badge {
+    opacity: 0;
     font-size: 150%;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
 
@@ -221,22 +222,37 @@
 .play-table {
   position: relative;
   overflow: hidden;
+  // Own stacking context: card z-indexes stay inside the table, so the speech bubble (a sibling) always paints above them.
+  isolation: isolate;
 }
 
 .speech-bubble {
   position: absolute;
   top: 6%;
   left: 0;
-  z-index: 100;
+  z-index: 500;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   width: 100%;
   pointer-events: none;
+  // Lets the sizes below use cqi (1% of this full-width bubble) so they do not depend on the shrink-wrapped wrapper.
+  container-type: inline-size;
+
+  // Shrinks to fit the avatar and content, so it can carry its own background zone.
+  .speech-bubble-wrapper {
+    display: flex;
+    align-items: flex-end;
+
+    background-color: rgba(0, 0, 0, .2);
+    box-shadow: 0 0 1rem 1rem rgba(0, 0, 0, .2);;
+    padding: .5rem;
+    border-radius: 1rem;
+  }
 
   .speech-bubble-avatar {
-    flex: 0 0 7.5%;
-    width: 7.5%;
+    flex: 0 0 7.5cqi;
+    width: 7.5cqi;
     height: auto;
     aspect-ratio: 1;
     filter: drop-shadow($box-shadow);
@@ -245,8 +261,8 @@
   .speech-bubble-content {
     position: relative;
     width: fit-content;
-    max-width: 66.667%;
-    margin-left: 2.5%;
+    max-width: 66.667cqi;
+    margin-left: 2.5cqi;
     background-color: $card-bg;
     border-radius: .667rem;
     filter: drop-shadow(0 0 1px #777) drop-shadow($box-shadow);
@@ -278,10 +294,31 @@
     pointer-events: auto;
   }
 
-  .speech-bubble-buttons {
-    margin-top: .75em;
+  // Buttons and countdown sit below the message; the message's bottom padding already spaces them from the text.
+  .speech-bubble-footer {
+    padding: 0 1em .25rem;
     font-family: var(--#{$prefix}font-sans-serif);
   }
+
+  // Shrinks from full width to empty over the bubble's timeout (duration set inline from the prop).
+  .speech-bubble-countdown {
+    height: .25rem;
+
+    .progress-bar {
+      width: 100%;
+      transform-origin: left;
+      animation: speech-bubble-countdown linear forwards;
+    }
+  }
+
+  .speech-bubble-buttons + .speech-bubble-countdown {
+    margin-top: .75em;
+  }
+}
+
+@keyframes speech-bubble-countdown {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
 }
 
 // ========== Components ==========

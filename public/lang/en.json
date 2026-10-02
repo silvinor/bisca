@@ -1,9 +1,12 @@
 {
   "appName": "Bisca",
   "app:close": "Close",
+  "app:done": "Done",
   "app:settings": "Settings",
   "app:quit": "Quit",
   "app:help": "Help",
+  "speech-bubble:ok": "OK",
+  "speech-bubble:cancel": "Cancel",
   "main:startupError": "Unable to load application resources.",
   "state-mode:game-mode": "Game mode",
   "state-mode:mode1": "Three's Bisca",

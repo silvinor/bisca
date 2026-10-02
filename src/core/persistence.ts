@@ -4,11 +4,11 @@
 const PERSISTENCE_PREFIX = 'bisca';
 
 export class Persistence {
-  public async get(group: string, name: string, defaultValue = ''): Promise<string> {
+  public get(group: string, name: string, defaultValue = ''): string {
     return localStorage.getItem(`${PERSISTENCE_PREFIX}.${group}.${name}`) ?? defaultValue;
   }
 
-  public async set(group: string, name: string, value: string): Promise<void> {
+  public set(group: string, name: string, value: string): void {
     localStorage.setItem(`${PERSISTENCE_PREFIX}.${group}.${name}`, value);
   }
 }

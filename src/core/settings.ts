@@ -60,12 +60,17 @@ class Settings {
 
     this.injectFavicons(this.settings.favicon);
 
+    // Library CSS must come before the app CSS, so the app CSS wins the cascade. Find the first app stylesheet
+    // before any library link exists: a <style data-vite-dev-id> in dev, or the bundled <link> in a build.
+    // If there is none, the anchor is null and the library links are appended to <head>.
+    const appCssAnchor = document.head.querySelector('style[data-vite-dev-id], link[rel="stylesheet"]');
+
     // Libraries are independent, but each library's JavaScript URLs run in order.
     await Promise.all(libraries.map(async (name) => {
       const resource = this.settings?.[name];
       const cssUrls = this.toArray(resource?.css);
       const jsUrls = this.toArray(resource?.js);
-      const cssLoaded = await Promise.all(cssUrls.map((href) => this.injectCSS(href)));
+      const cssLoaded = await Promise.all(cssUrls.map((href) => this.injectCSS(href, appCssAnchor)));
 
       let jsLoaded = true;
       for (const src of jsUrls) {
@@ -111,7 +116,7 @@ class Settings {
     }
   }
 
-  private injectCSS(href: string): Promise<boolean> {
+  private injectCSS(href: string, before: Element | null): Promise<boolean> {
     return new Promise((resolve) => {
       const link = document.createElement("link");
       link.rel = "stylesheet";
@@ -121,7 +126,7 @@ class Settings {
         console.error(`[Settings] Failed to load CSS: ${href}`);
         resolve(false);
       };
-      document.head.appendChild(link);
+      document.head.insertBefore(link, before);
     });
   }
 

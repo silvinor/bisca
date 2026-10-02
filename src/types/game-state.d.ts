@@ -94,32 +94,26 @@ export const DEFAULT_GAME_COUNT = GAME_COUNT_TWO;
 
 /* ---------- Getters and Setters ---------- */
 
-export async function getGameMode(fallback_or_default: GameMode = DEFAULT_GAME_MODE): Promise<GameMode> {
-  return await persistence.get(SAVE_GROUP_OPTION, SAVE_NAME_MODE, fallback_or_default) as GameMode;
+export function getGameMode(fallback_or_default: GameMode = DEFAULT_GAME_MODE): GameMode {
+  return persistence.get(SAVE_GROUP_OPTION, SAVE_NAME_MODE, fallback_or_default) as GameMode;
 } 
 
 export function setGameMode(mode: GameMode = DEFAULT_GAME_MODE): void {
-  void persistence.set(SAVE_GROUP_OPTION, SAVE_NAME_MODE, mode).catch((error: unknown) => {
-    logger.warn('[Persistence] Failed to save game mode:', error); // don't i18n
-  });
+  persistence.set(SAVE_GROUP_OPTION, SAVE_NAME_MODE, mode);
 } 
 
-export async function getDifficulty(fallback_or_default: Difficulty = DEFAULT_GAME_DIFFICULTY): Promise<Difficulty> {
-  return await persistence.get(SAVE_GROUP_OPTION, SAVE_NAME_DIFFICULTY, fallback_or_default) as Difficulty;
+export function getDifficulty(fallback_or_default: Difficulty = DEFAULT_GAME_DIFFICULTY): Difficulty {
+  return persistence.get(SAVE_GROUP_OPTION, SAVE_NAME_DIFFICULTY, fallback_or_default) as Difficulty;
 }
 
 export function setDifficulty(difficulty: Difficulty = DEFAULT_GAME_DIFFICULTY): void {
-  void persistence.set(SAVE_GROUP_OPTION, SAVE_NAME_DIFFICULTY, difficulty).catch((error: unknown) => {
-    logger.warn('[Persistence] Failed to save game difficulty:', error); // don't i18n
-  });
+  persistence.set(SAVE_GROUP_OPTION, SAVE_NAME_DIFFICULTY, difficulty);
 }
 
-export async function getMatchCount(fallback_or_default: MatchCount = DEFAULT_GAME_COUNT): Promise<MatchCount> {
-  return await persistence.get(SAVE_GROUP_OPTION, SAVE_NAME_COUNT, fallback_or_default) as MatchCount;
+export async function getMatchCount(fallback_or_default: MatchCount = DEFAULT_GAME_COUNT): MatchCount {
+  return persistence.get(SAVE_GROUP_OPTION, SAVE_NAME_COUNT, fallback_or_default) as MatchCount;
 }
 
 export function setMatchCount(count: MatchCount = DEFAULT_GAME_COUNT): void {
-  void persistence.set(SAVE_GROUP_OPTION, SAVE_NAME_COUNT, count).catch((error: unknown) => {
-    logger.warn('[Persistence] Failed to save game match count:', error); // don't i18n
-  });
+  persistence.set(SAVE_GROUP_OPTION, SAVE_NAME_COUNT, count);
 }

@@ -18,8 +18,8 @@ import {
 
 export function saveGameProgress(progress: StateMain): void {
   void Promise.all([
-    persistence.set(SAVE_GROUP_OPTION, SAVE_PROGRESS, progress),
-    persistence.set(SAVE_GROUP_OPTION, SAVE_PROGRESS_TIMESTAMP, String(Date.now())),
+    persistence.set( SAVE_GROUP_OPTION, SAVE_PROGRESS, progress ),
+    persistence.set( SAVE_GROUP_OPTION, SAVE_PROGRESS_TIMESTAMP, String(Date.now()) ),
   ]).catch((error: unknown) => {
     logger.warn('[Persistence] Failed to save game progress:', error);
   });
@@ -28,8 +28,8 @@ export function saveGameProgress(progress: StateMain): void {
 export async function loadGameProgress(): Promise<StateMain | null> {
   try {
     const [progress, savedAt] = await Promise.all([
-      persistence.get(SAVE_GROUP_OPTION, SAVE_PROGRESS),
-      persistence.get(SAVE_GROUP_OPTION, SAVE_PROGRESS_TIMESTAMP),
+      persistence.get( SAVE_GROUP_OPTION, SAVE_PROGRESS ),
+      persistence.get( SAVE_GROUP_OPTION, SAVE_PROGRESS_TIMESTAMP ),
     ]);
     const isFresh = Date.now() - Number(savedAt || 0) < REFRESH_RESET_TIMEOUT * 1000;
     return isFresh ? progress as StateMain : null;

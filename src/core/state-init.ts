@@ -3,7 +3,7 @@
 
 import { StateMain, TABLE_COLOR_GREEN, TABLE_TEXTURE_FELT } from '../types/game-state.d';
 import { GameState } from './game-state';
-import { logger } from './logger';
+// import { logger } from './logger';
 import { persistence } from './persistence';
 import { loadGameProgress } from './game-common';
 import { applyTableColorClass, applyTableTextureClass } from './dynamic-css';
@@ -27,16 +27,11 @@ export class InitGameState extends GameState<StateMain> {
     
     // Best-effort and non-blocking: themes the table as soon as possible
     // without delaying the progress-based routing decision below.
-    void persistence.get(SAVE_GROUP_OPTION, SAVE_TABLE_COLOR, TABLE_COLOR_GREEN)
-      .then(applyTableColorClass)
-      .catch((error: unknown) => {
-        logger.warn('[Persistence] Failed to load table color:', error);
-      });
-    void persistence.get(SAVE_GROUP_OPTION, SAVE_TABLE_TEXTURE, TABLE_TEXTURE_FELT)
-      .then(applyTableTextureClass)
-      .catch((error: unknown) => {
-        logger.warn('[Persistence] Failed to load table texture:', error);
-      });
+    const color = persistence.get( SAVE_GROUP_OPTION, SAVE_TABLE_COLOR, TABLE_COLOR_GREEN );
+    applyTableColorClass(color);
+
+    const texture = persistence.get( SAVE_GROUP_OPTION, SAVE_TABLE_TEXTURE, TABLE_TEXTURE_FELT );
+    applyTableTextureClass(texture);
   }
 
   protected draw(): void {

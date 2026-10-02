@@ -121,10 +121,10 @@ function initialCtx(): Ctx {
   };
 }
 
-export async function loadG(): Promise<G> {
+export function loadG(): G {
   try {
     return JSON.parse(
-      await persistence.get(SAVE_GROUP_OPTION, SAVE_GLOBAL, JSON.stringify(g)),
+      persistence.get( SAVE_GROUP_OPTION, SAVE_GLOBAL, JSON.stringify(g) ),
     ) as G;
   } catch (error: unknown) {
     logger.error('[Game context] Failed to load saved state:', error);
@@ -132,8 +132,8 @@ export async function loadG(): Promise<G> {
   }
 }
 
-export function saveG(g: G): Promise<void> {
-  return persistence.set(SAVE_GROUP_OPTION, SAVE_GLOBAL, JSON.stringify(g));
+export function saveG(g: G): void {
+  persistence.set( SAVE_GROUP_OPTION, SAVE_GLOBAL, JSON.stringify(g) );
 }
 
 /** Singleton game state, available from app startup. */

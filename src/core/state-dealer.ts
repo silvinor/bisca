@@ -25,6 +25,7 @@ import {
 import { StateSelectDealer } from '../ui/state-dealer';
 import { g } from './game-context';
 import { SELECT_DEALER } from '../types/state-dealer.d';
+import { getTrickWinner } from './deck-handler';
 
 export interface DealerSelectionAction extends Trigger {
   nextState: StateMain | null;
@@ -201,21 +202,41 @@ export interface DealerSelectionAction extends Trigger {
 // }
 
 export class SelectDealerGameState extends GameState<StateMain, DealerSelectionAction | Trigger> {
+  private _init: boolean = false;
   private stateStep: SELECT_DEALER = SELECT_DEALER.INIT;
   private deck: string = DEFAULT_DECK_CARDS;
   private mode: GameMode = GAME_MODE_1;
   private picks: number[] = [];
+  private dealer: number = -1;
 
   public constructor() {
     super(StateMain.SELECT_DEALER);
   }
 
+  private readonly onPick = (cardIndex: number): void => {
+    if (this.stateStep == SELECT_DEALER.USER_PICKING) {
+      this.trigger({  action: ACTION_SELECT, cardIndex: cardIndex });
+    }
+  };
+
+  private readonly onNext = (): void => {
+    if (this.stateStep == SELECT_DEALER.EVAL) {
+      
+      // FIXME!!!!!!!
+
+    }
+  };
+
   protected init(): void {
     logger.debug('SELECT_DEALER --> Init');
-    saveGameProgress(StateMain.SELECT_DEALER);
+    if (!this._init) {
+      saveGameProgress(StateMain.SELECT_DEALER);
+      this._init = true;
+    }
     this.stateStep = 0;
     logger.info(g);
     this.picks = [];
+    this.dealer = -1;
     this.resetTrigger();
   }
 
@@ -226,6 +247,7 @@ export class SelectDealerGameState extends GameState<StateMain, DealerSelectionA
         
     switch (this.stateStep) {
       case SELECT_DEALER.INIT:
+        logger.debug('********** INIT **********');
         try {
           this.mode = await getGameMode(this.mode);
         } catch (error: unknown) {
@@ -235,11 +257,12 @@ export class SelectDealerGameState extends GameState<StateMain, DealerSelectionA
         break;
 
       case SELECT_DEALER.USER_PICKING:
+        logger.debug('********** USER_PICKING **********');
         // ... do nothing ...
          break;
 
       case SELECT_DEALER.COMPUTER_PICKING:
-        logger.info('********** COMPUTER_PICKING **********');
+        logger.debug('********** COMPUTER_PICKING **********');
 
         // Give each computer player a distinct card that no earlier player picked.
         for (let player = 1; player < playerCount(this.mode); player++) {
@@ -251,6 +274,17 @@ export class SelectDealerGameState extends GameState<StateMain, DealerSelectionA
         logger.info(this.picks);
 
         break;
+
+      case SELECT_DEALER.EVAL:
+        logger.debug('********** EVAL **********');
+        const trick: string[] = this.picks.map((cardIndex) => this.deck[cardIndex - 1]);
+        this.dealer = getTrickWinner(trick);
+
+        logger.info(trick);
+        logger.info(`Winner is ${this.dealer}`);
+
+        break;
+
     }
   }
 
@@ -258,21 +292,28 @@ export class SelectDealerGameState extends GameState<StateMain, DealerSelectionA
     logger.debug(`SELECT_DEALER --> Draw ${this.stateStep}`);
 
     switch(this.stateStep) {
-        case SELECT_DEALER.INIT:
-          this.trigger({action: ACTION_NEXT});
-          break;
-
         case SELECT_DEALER.USER_PICKING:
         case SELECT_DEALER.COMPUTER_PICKING:
+        case SELECT_DEALER.EVAL:
           const appMain = document.getElementById('app-main');
           if (appMain) render(h(StateSelectDealer, { 
             step: this.stateStep,
             picks: this.picks,
             mode: this.mode,
+            deck: this.deck,
+            dealer: this.dealer,
             onPick: this.onPick,
+            onNext: this.onNext,
           }), appMain);
           break;
+    }
 
+    // Auto next set
+    switch(this.stateStep) {
+        case SELECT_DEALER.INIT:
+        case SELECT_DEALER.COMPUTER_PICKING:
+          this.trigger({action: ACTION_NEXT});
+          break;
     }
   }
 
@@ -286,6 +327,9 @@ export class SelectDealerGameState extends GameState<StateMain, DealerSelectionA
       switch(lastStateStep) {
         case SELECT_DEALER.INIT:
           this.stateStep = SELECT_DEALER.USER_PICKING;
+          break;
+        case SELECT_DEALER.COMPUTER_PICKING:
+          this.stateStep = SELECT_DEALER.EVAL;
           break;
       }
     } else if (this.triggered && this.lastTrigger?.action === ACTION_SELECT) {
@@ -323,9 +367,4 @@ export class SelectDealerGameState extends GameState<StateMain, DealerSelectionA
     if (appMain) render(null, appMain);
   }
 
-  private readonly onPick = (cardIndex: number): void => {
-    if (this.stateStep == SELECT_DEALER.USER_PICKING) {
-      this.trigger({  action: ACTION_SELECT, cardIndex: cardIndex });
-    }
-  };
 }

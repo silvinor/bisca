@@ -1,9 +1,12 @@
 {
   "appName": "Bisca",
   "app:close": "Fechar",
+  "app:done": "Feito",
   "app:settings": "Opções",
   "app:quit": "Desistir",
   "app:help": "Ajuda",
+  "speech-bubble:ok": "OK",
+  "speech-bubble:cancel": "Cancelar",
   "main:startupError": "A aplicação não conseguiu carregar os recursos necessários.",
   "state-mode:game-mode": "Modo de jogo",
   "state-mode:mode1": "Bisca dos Três",
