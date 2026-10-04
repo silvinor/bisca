@@ -1,7 +1,9 @@
 // Copyright (c) 2026 @SilvinoR
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-/** Finds a same-origin stylesheet rule by selector text (e.g. ".bg-green"), skipping any cross-origin sheet whose rules aren't readable. */
+/** Finds a same-origin stylesheet rule by selector text (e.g. ".bg-green"), 
+ * skipping any cross-origin sheet whose rules aren't readable.
+ */
 function findCssRuleText(selector: string): string | null {
   for (const sheet of Array.from(document.styleSheets)) {
     let rules: CSSRuleList;
@@ -57,5 +59,21 @@ export function applyPlayingCardHeight(height: number): void {
     document.head.appendChild(styleElement);
   }
 
-  styleElement.textContent = `.playing-card { height: ${height}px }`;
+  styleElement.textContent = `.playing-card { height: ${Math.round(height * 1000) / 1000}px }`;
 }
+
+/** Stores the normalized deck class currently applied to the body so a deck change can remove it. */
+let bodyDeckClass: string | null = null;
+
+/** Replaces the deck class on the body with a valid CSS class derived from the selected deck name. */
+export function applyGameDeckClass(deck: string): void {
+  // Remove the previous deck class before applying the new selection.
+  if (bodyDeckClass !== null) document.body.classList.remove(bodyDeckClass);
+
+  // Replace invalid characters and guard names that cannot start a CSS identifier.
+  const deckClass = 'deck-' + (deck.trim().replace(/[^a-zA-Z0-9_-]+/g, '-'));
+  
+  // Apply and remember the exact normalized class for the next deck change.
+  document.body.classList.add(deckClass);
+  bodyDeckClass = deckClass;
+};

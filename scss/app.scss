@@ -13,8 +13,8 @@
 @import "variables";
 
 // @import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Google+Sans+Code:ital,wght,MONO@0,300..800,1;1,300..800,1&display=swap');
-@import url('/assets/fnt/Roobert.css');
-@import url('/assets/fnt/Excalifont.css');
+// @import url('/assets/fnt/Roobert.css'); // already loaded via settings.json
+// @import url('/assets/fnt/Excalifont.css'); // already loaded via settings.json
 
 :root {
   // --#{$prefix}font-sans-serif: 'Google Sans', #{inspect($font-family-sans-serif)};
@@ -22,36 +22,25 @@
   --#{$prefix}font-sans-serif: 'Roobert', #{inspect($font-family-sans-serif)};
   --#{$prefix}font-monospace: 'Roobert Mono', #{inspect($font-family-monospace)};
   --#{$prefix}font-serif: 'Excalifont', cursive, serif;
+
+  --#{$prefix}border-radius-md: 0.45rem;
 }
 
 // ---------- DEBUG -----------
 
 .debug {
-
-  #app {
-    // background-color: #096;
-  }
-
-  .d {
-    // outline: 1px dotted red;
-  }
-
-  // header { outline: 1px dashed red; }
-  main { 
-    // outline: 1px dashed green; 
-    // border: 1px dashed green;
-  }
-
-  // footer { outline: 1px dashed blue; }
-
   .debug-badge {
-    opacity: 0;
+    opacity: 0.75;
     font-size: 150%;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
 
     @include color-scheme(dark) {
       box-shadow: 0 5px 10px rgba(255, 255, 255, 0.2);
     }
+  }
+
+  .speech-bubble {
+    pointer-events: auto !important;
   }
 }
 
@@ -67,7 +56,17 @@
   height: 2rem;
   width: auto;
   min-width: 2rem;
-  opacity: .75;
+  opacity: .8;
+
+  background-color: transparent;
+  color: var(--#{$prefix}body-color);
+  border-width: 2px;
+  border-radius: 50%;
+  border-color: var(--#{$prefix}body-color);
+
+  &:hover {
+    box-shadow: var(--#{$prefix}btn-focus-box-shadow);
+  }
 }
 
 .bg-green { background-color: $table-green; }
@@ -90,6 +89,84 @@
 .bg-suede { background-image: url('/assets/img/table/suede.png'); }
 .bg-digital { background-image: url('/assets/img/table/digital.png'); }
 
+// ---------- App visual space ----------
+//  Preact host owns the runtime-configurable table background.
+
+#app-header,
+#app-footer {
+  z-index: 2;
+  background-color: #FFF2;
+}
+
+// #app-main {
+//   // Flex children default to min-height: auto, which lets content push the
+//   // whole page taller instead of scrolling inside this element.
+ // }
+
+#app-footer {
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+.app-fieldset:not(:last-child) {
+  border-bottom: $frame-width solid $frame-color-l;
+}
+
+@include color-scheme(dark) {
+  #app-header,
+  #app-footer {
+    background-color: #0003;
+  }
+
+  .app-fieldset:not(:last-child) {
+    border-bottom-color: $frame-color-d;
+  }
+}
+
+// ---------- Playing Table ----------
+
+#app-main {
+  position: relative;
+}
+
+.play-table {
+  position: relative;
+  overflow: hidden;
+  // Own stacking context: card z-indexes stay inside the table, so the speech bubble (a sibling) always paints above them.
+  isolation: isolate;
+}
+
+body {
+  .playing-card {
+    filter:
+      drop-shadow(0 0 1px rgba(0, 0, 0, 0.8))
+      drop-shadow($box-shadow-sm);
+    transition: 0.3s;
+
+    &:hover {
+      filter:
+        drop-shadow(0 0 1px rgba(0, 0, 0, 0.8))
+        drop-shadow($box-shadow);
+    }
+  }
+
+  // &.deck-default,
+  // &.deck-fantasy,
+  // &.deck-gilded,
+  // &.deck-large,
+  // &.deck-napoletane,
+  // &.deck-online,
+  // &.deck-public,
+  // &.deck-spanish,
+  // &.deck-swiss,
+  // &.deck-triestine {
+  //   .playing-card {
+  //   }
+  // }
+}
+
 // ---------- Radio Images ----------
 
 .radio-images {
@@ -97,20 +174,20 @@
   flex-wrap: wrap;
   gap: .5rem;
 
-  .radio-images-bg {
-    rect {
-      // fill: #096;
-    }
+  // .radio-images-bg {
+  //   // rect {
+  //   //   // fill: #096;
+  //   // }
 
-    // Table Color swatches (state-settings.tsx): option.classes[0] selects
-    // one. Nested here (not a bare top-level rule) so the compound selector
-    // outranks the unconditional fill above regardless of source order.
-    // &.bg-green rect { fill: $table-green; }
-    // &.bg-red rect { fill: transparent; }
-    // &.bg-blue rect { fill: $table-blue; }
-    // &.bg-ebony rect { fill: $table-ebony; }
-    // &.bg-purple rect { fill: $table-purple; }
-  }
+  //   // Table Color swatches (state-settings.tsx): option.classes[0] selects
+  //   // one. Nested here (not a bare top-level rule) so the compound selector
+  //   // outranks the unconditional fill above regardless of source order.
+  //   // &.bg-green rect { fill: $table-green; }
+  //   // &.bg-red rect { fill: transparent; }
+  //   // &.bg-blue rect { fill: $table-blue; }
+  //   // &.bg-ebony rect { fill: $table-ebony; }
+  //   // &.bg-purple rect { fill: $table-purple; }
+  // }
 
   .selected .radio-images-ov {
     background-color: #fff3;
@@ -175,56 +252,7 @@
   }
 }
 
-
-// ---------- App visual space ----------
-//  Preact host owns the runtime-configurable table background.
-
-#app-header,
-#app-footer {
-  z-index: 2;
-  background-color: #FFF2;
-}
-
-// #app-main {
-//   // Flex children default to min-height: auto, which lets content push the
-//   // whole page taller instead of scrolling inside this element.
- // }
-
- #app-footer {
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
-}
-
-.app-fieldset:not(:last-child) {
-  border-bottom: $frame-width solid $frame-color-l;
-}
-
-@include color-scheme(dark) {
-
-  #app-header,
-  #app-footer {
-    background-color: #0003;
-  }
-
-  .app-fieldset:not(:last-child) {
-    border-bottom-color: $frame-color-d;
-  }
-}
-
-// ---------- Playing Table ----------
-
-#app-main {
-  position: relative;
-}
-
-.play-table {
-  position: relative;
-  overflow: hidden;
-  // Own stacking context: card z-indexes stay inside the table, so the speech bubble (a sibling) always paints above them.
-  isolation: isolate;
-}
+// ---------- Speech Bubble ----------
 
 .speech-bubble {
   position: absolute;
@@ -244,18 +272,25 @@
     display: flex;
     align-items: flex-end;
 
+    /*
     background-color: rgba(0, 0, 0, .2);
     box-shadow: 0 0 1rem 1rem rgba(0, 0, 0, .2);;
     padding: .5rem;
     border-radius: 1rem;
+    */
   }
 
   .speech-bubble-avatar {
-    flex: 0 0 7.5cqi;
-    width: 7.5cqi;
-    height: auto;
+    // flex: 0 0 7.5cqi;
+    // width: 7.5cqi;
+    flex: 0 0 6cqi;
+    width: auto;
+    height: 6cqi;
     aspect-ratio: 1;
-    filter: drop-shadow($box-shadow);
+    filter:
+      drop-shadow(0 0 10px rgba(0, 0, 0, .8))
+      drop-shadow($box-shadow);
+    border-radius: 33.333%;
   }
 
   .speech-bubble-content {
@@ -265,7 +300,9 @@
     margin-left: 2.5cqi;
     background-color: $card-bg;
     border-radius: .667rem;
-    filter: drop-shadow(0 0 1px #777) drop-shadow($box-shadow);
+    filter: 
+      drop-shadow(0 0 10px rgba(0, 0, 0, .8))
+      drop-shadow($box-shadow);
   }
 
   .speech-bubble-tip {
@@ -293,7 +330,7 @@
   &.speech-bubble-prompt .speech-bubble-content {
     pointer-events: auto;
   }
-
+  
   // Buttons and countdown sit below the message; the message's bottom padding already spaces them from the text.
   .speech-bubble-footer {
     padding: 0 1em .25rem;
@@ -391,11 +428,3 @@
   }
 
 }
-
-
-// ---------- Core library overrides ----------
-
-// .fa-fw,
-// .fa-width-fixed {
-//   width: 1.333em;
-// }

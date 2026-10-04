@@ -4,12 +4,17 @@
 const PERSISTENCE_PREFIX = 'bisca';
 
 export class Persistence {
-  public get(group: string, name: string, defaultValue = ''): string {
-    return localStorage.getItem(`${PERSISTENCE_PREFIX}.${group}.${name}`) ?? defaultValue;
+  public get(group: string, name: string, defaultValue?: string): string | null {
+    const value = localStorage.getItem(`${PERSISTENCE_PREFIX}.${group}.${name}`);
+    return value === null ? defaultValue ?? null : value;
   }
 
-  public set(group: string, name: string, value: string): void {
-    localStorage.setItem(`${PERSISTENCE_PREFIX}.${group}.${name}`, value);
+  public set(group: string, name: string, value: string | null): void {
+    if (value === null) {
+      localStorage.removeItem(`${PERSISTENCE_PREFIX}.${group}.${name}`);
+    } else {
+      localStorage.setItem(`${PERSISTENCE_PREFIX}.${group}.${name}`, value);
+    }
   }
 }
 

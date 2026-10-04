@@ -36,7 +36,6 @@ import {
 import { 
   ACTION_SETTINGS,
   ACTION_HELP,
-  DEFAULT_DECK_CARDS,
 } from './constants';
 import { g, type G, saveG } from './game-context';
 import { logger } from './logger';
@@ -126,7 +125,7 @@ export class GameModeGameState extends GameState<StateMain, GameModeSelection | 
     if ('mode' in selection) g.mode = selection.mode;
     if ('difficulty' in selection) g.difficulty = selection.difficulty;
     if ('matchCount' in selection) g.matchCnt = MATCH_COUNT_VALUES[selection.matchCount];
-    g.deck = DEFAULT_DECK_CARDS;
+    g.deck = ''; // void the deck so that Dealer Selection can initialise
     saveG(g);
 
     if (selection.action == ACTION_SETTINGS) {

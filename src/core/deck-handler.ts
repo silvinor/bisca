@@ -33,6 +33,7 @@ import {
   type ScoreKeeping,
 } from '../types/game-state.d';
 import { logger } from './logger';
+import { applyGameDeckClass } from './dynamic-css';
 
 /** Maps a Digital Deck card identifier to its card-deck file name suffix. See docs/card-deck-numbering.md. */
 enum CardDeckFileName {
@@ -198,6 +199,7 @@ export function getGameDeckName(fallback_or_default: string = DEFAULT_GAME_DECK_
 
 export function setGameDeckName(name: string = DEFAULT_GAME_DECK_NAME): void {
   persistence.set( SAVE_GROUP_OPTION, SAVE_GAME_DECK, name );
+  applyGameDeckClass( name );
 }
 
 /** Resolves the currently selected ten-point-card face variant from persisted settings. */
@@ -237,7 +239,7 @@ export function setCourtCardPoints(points: CourtCardPoints = DEFAULT_COURT_CARD_
 /* ---------- Persistence ---------- */
 
 /** Resolves the currently selected card back for the active game deck from persisted settings.
- * Card backs are remembered per deck, under a compounded key (e.g. "card-back-gilded"), so switching
+ * Card backs are remembered per deck, under a compounded key (e.g. "back.gilded"), so switching
  * decks and back restores each deck's own last pick instead of sharing one back across all decks.
  */
 export function getCardBack(
@@ -245,7 +247,7 @@ export function getCardBack(
   deck: string | null = null,
 ): string {
   const currentDeckName = deck ?? getGameDeckName();
-  return persistence.get( SAVE_GROUP_OPTION,  `${SAVE_CARD_BACK}-${currentDeckName}`,  fallback_or_default );
+  return persistence.get( SAVE_GROUP_OPTION,  `${SAVE_CARD_BACK}.${currentDeckName}`,  fallback_or_default );
 }
 
 export function setCardBack(

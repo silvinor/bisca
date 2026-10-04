@@ -18,7 +18,7 @@ The deck is first shuffled [^2] and then fanned (or picked from the wash), with 
 
 The dealer then gives 3 cards (or more depending on [game mode](#game_mode)) to each player, one card at a time, beginning with the player to dealer's right, going around anticlockwise and ending with the dealer. The next card is then turned face up, and its suit becomes trumps (called *trunfo*). It is then placed at the bottom of the deck, partially visible.
 
-In the Sueca game mode the card top of the split deck becomes the trump card, and is placed face up on the dealers side - the dealer keeps the remaining 9 cards to themselves and may plat the trump card at any time.
+In the Sueca game mode the card top of the split deck becomes the trump card, and is placed face up on the dealers side - the dealer keeps the remaining 9 cards to themselves and may play the trump card at any time.
 
 ### The play
 

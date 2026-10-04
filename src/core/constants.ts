@@ -14,7 +14,7 @@ import {
 
 // general items
 export const APP_COPYRIGHT_HOLDER = "@SilvinoR";
-export const APP_SPEECH_BUBBLE_DELAY = 5000;
+export const APP_SPEECH_BUBBLE_DELAY = 7500;
 
 // file paths
 export const APP_LANGUAGE_PATH = '/lang';
@@ -22,7 +22,7 @@ export const APP_HELP_PATH = '/help';
 export const APP_DECKS_PATHS = '/assets/img/decks';
 
 export const APP_LOGO_FILE = '/assets/img/logo.svg';
-export const APP_SPEECH_BUBBLE_AVATAR_FILE = '/assets/img/anonymous.svg';
+export const APP_SPEECH_BUBBLE_AVATAR_FILE = '/assets/img/user.svg';
 
 /* Reactions and Triggers */
 export const ACTION_GO = 'go';
@@ -50,6 +50,7 @@ export const SAVE_CARD_BACK = 'back';
 export const SAVE_TABLE_COLOR = 'color';
 export const SAVE_TABLE_TEXTURE = 'texture';
 export const SAVE_GLOBAL = 'global';
+export const SAVE_SELECT_DEALER = 'select.dealer';
 
 // Deck catalog
 export const MAX_CARD_BACKS = 26;
@@ -64,7 +65,8 @@ export const PLAYING_SURFACE_ASPECT_RATIO = 3 / 2;
 export const PLAYING_CARD_SIZE_RATIO = 0.2;
 
 /* Game engine */
-export const DEFAULT_DECK_CARDS = "BCDEFLKMGAbcdeflkmgaOPQRSYXZTNopqrsyxztn";
+export const DEFAULT_DECK_CARDS = 'BCDEFLKMGAbcdeflkmgaOPQRSYXZTNopqrsyxztn';
+export const TWOS_DECK_CARDS = 'BbOo';
 export const UNKNOWN_DEALER = -1;
 
 /* Defaults for settings etc. */

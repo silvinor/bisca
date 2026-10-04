@@ -6,12 +6,14 @@ import { GameState } from './game-state';
 // import { logger } from './logger';
 import { persistence } from './persistence';
 import { loadGameProgress } from './game-common';
-import { applyTableColorClass, applyTableTextureClass } from './dynamic-css';
+import { applyGameDeckClass, applyTableColorClass, applyTableTextureClass } from './dynamic-css';
 import {
   SAVE_GROUP_OPTION,
   SAVE_TABLE_COLOR,
   SAVE_TABLE_TEXTURE,
 } from './constants';
+import { loadG } from './game-context';
+import { getGameDeckName } from './deck-handler';
 
 export class InitGameState extends GameState<StateMain> {
   public constructor() {
@@ -32,6 +34,9 @@ export class InitGameState extends GameState<StateMain> {
 
     const texture = persistence.get( SAVE_GROUP_OPTION, SAVE_TABLE_TEXTURE, TABLE_TEXTURE_FELT );
     applyTableTextureClass(texture);
+
+    loadG();
+    applyGameDeckClass( getGameDeckName() );
   }
 
   protected draw(): void {

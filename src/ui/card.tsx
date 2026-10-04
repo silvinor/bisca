@@ -18,7 +18,7 @@ export function CardFace({ letter, style, onClick }: CardFaceProps) {
   if (!onClick) {
     return (
       <img
-        className='playing-card position-absolute w-auto rounded shadow'
+        className='playing-card position-absolute w-auto'
         style={style}
         src={src}
         alt=''
@@ -35,7 +35,7 @@ export function CardFace({ letter, style, onClick }: CardFaceProps) {
       onClick={onClick}
     >
       <img
-        className='h-100 w-auto rounded shadow'
+        className='h-100 w-auto'
         src={src}
         alt=''
         draggable={false}
@@ -57,7 +57,7 @@ export function CardBack({ style, onClick }: CardBackProps) {
   if (!onClick) {
     return (
       <img
-        className='playing-card position-absolute w-auto rounded shadow'
+        className='playing-card position-absolute w-auto'
         style={style}
         src={src}
         alt=''
@@ -74,7 +74,7 @@ export function CardBack({ style, onClick }: CardBackProps) {
       onClick={onClick}
     >
       <img 
-        className='h-100 w-auto rounded shadow' 
+        className='h-100 w-auto' 
         src={src}
         alt=''
         draggable={false}
