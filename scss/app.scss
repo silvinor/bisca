@@ -98,10 +98,15 @@
   background-color: #FFF2;
 }
 
-// #app-main {
-//   // Flex children default to min-height: auto, which lets content push the
-//   // whole page taller instead of scrolling inside this element.
- // }
+#app-main {
+  overflow: hidden;
+
+  @include color-scheme(dark) {
+    background-image: url('/assets/img/table/_spotlight.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+  }
+}
 
 #app-footer {
   a {

@@ -237,32 +237,46 @@ export function StateSelectPick2({
   let bubble: ComponentChildren = null;
   let cards: ComponentChildren = null;
 
+  const cardStyle = (index: number) => {
+    return {
+      left: `${(index + 1) * 20}%`,
+      top: '50%',
+      transform: 'translate(-50%, -50%)',
+      zIndex: index + 1,
+    };
+  };
+
+  if (step === SELECT_DEALER.ASK_TO_PICK_2) {
+    bubble = <SpeechBubble>{i18n.t('state-dealer:pick-two')}</SpeechBubble>;
+  } else if (step === SELECT_DEALER.USER_PICKED_2 || step === SELECT_DEALER.COMPUTER_PICK_2) {
+    bubble = <SpeechBubble
+      timeout={APP_SPEECH_BUBBLE_DELAY}
+      onTimeout={onNext}
+    >{i18n.t('state-dealer:discard-card')}</SpeechBubble>;
+  }
+
   cards = Array.from({ length: s.twos.length }, (_, index) => {
     const cardIndex = index + 1;
-    const player = s.twop.indexOf(cardIndex);
-
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
-
-    if (player !== -1) {
+    
+    if (s.discard > 0 && cardIndex === s.discard) {
       return (
-        <Fragment key={index}>
-          <CardFace
-            letter={s.twos[cardIndex - 1]}
-            style={pickedCardStyle(player, s.mode)}
-          />
-          {debugBadges?.[player]}
-        </Fragment>
+        <CardFace
+          key={cardIndex}
+          letter={s.twos[cardIndex - 1]}
+          style={cardStyle(index)}
+        />
       );
-    } else return (
-      <CardBack
-        key={index}
-        style={cardStyle(index)}
-      />
-    );
+    } else {
+      return (
+        <CardBack
+          key={cardIndex}
+          style={cardStyle(index)}
+          onClick={step === SELECT_DEALER.ASK_TO_PICK_2 ? () => onPick(cardIndex) : undefined}
+        />
+      );
+    }
   });
-
-
+ 
   return (
     <>
       {bubble}

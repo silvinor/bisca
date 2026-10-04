@@ -21,7 +21,7 @@ interface SpeechBubbleProps {
   children: ComponentChildren;
   avatarAlt?: string;
   avatarSrc?: string;
-  /** Milliseconds before `onTimeout` fires. Change `key` to restart the timer for a new message. */
+  /** Milliseconds before `onTimeout` fires. Space, Enter, or Escape ends the delay early. */
   timeout?: number;
   onTimeout?: () => void;
   /** Supplying `onOk` and/or `onCancel` turns the bubble into a confirm prompt with those buttons. */
@@ -46,11 +46,29 @@ export function SpeechBubble({
   const onTimeoutRef = useRef(onTimeout);
   onTimeoutRef.current = onTimeout;
 
-  // Start one timer per mounted message, and clear it if the bubble unmounts or the delay changes first.
+  // Start one timer per mounted message, and let the keyboard shortcuts finish the same timer early.
   useEffect(() => {
     if (timeout === undefined) return;
-    const timer = window.setTimeout(() => onTimeoutRef.current?.(), timeout);
-    return () => window.clearTimeout(timer);
+
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      window.clearTimeout(timer);
+      onTimeoutRef.current?.();
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== ' ' && event.key !== 'Enter' && event.key !== 'Escape') return;
+      event.preventDefault();
+      finish();
+    };
+
+    const timer = window.setTimeout(finish, timeout);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener('keydown', onKeyDown);
+    };
   }, [timeout]);
 
   const isPrompt = onOk !== undefined || onCancel !== undefined;

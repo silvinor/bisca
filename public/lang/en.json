@@ -75,7 +75,7 @@
   "state-dealer:player-1-deals": "Player 1 deals first.",
   "state-dealer:player-2-deals": "Player 2 deals first.",
   "state-dealer:player-3-deals": "Player 3 deals first.",
-  "state-dealer:pick-two": "Pick a two to remove.",
-  "state-dealer:discard-card": "Remove card",
+  "state-dealer:pick-two": "Pick a card to remove.",
+  "state-dealer:discard-card": "This card will be removed from the deck.",
   "reactions:confirm-quit": "Are you sure you want to quit the current game?"
 }

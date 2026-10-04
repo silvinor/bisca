@@ -48,7 +48,8 @@ export interface G {
   matchCnt: 1 | 2 | 3 | 4;
   deck: string;
   dealer: number;
-  
+  discard: string; // cards removed from deck - mode 4, picked 2
+
   // matchSetCount: 1 | 2 | 3;
   // setIndex: number;
   // setResults: SetResult[];
@@ -83,6 +84,7 @@ function initialG(): G {
     matchCnt: 1,
     deck: DEFAULT_DECK_CARDS,
     dealer: UNKNOWN_DEALER,
+    discard: '',
     // matchSetCount: 1,
     // setIndex: 0,
     // setResults: [],

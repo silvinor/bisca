@@ -11,10 +11,10 @@ export enum SELECT_DEALER {
   // EQUAL_HIGHEST,
   // USER_HIGHEST,
   // COMPUTER_HIGHEST,
-  START_PICK_2,
-  USER_PICK_2,
+  ASK_TO_PICK_2,
+  USER_PICKED_2,
   COMPUTER_PICK_2,
-  DISCARD_2,
+  // DISCARD_2,
   END,
 };
 
@@ -24,5 +24,5 @@ export interface S {
   picks: number[]; // picked cards from deck
   dealer: number; // winning dealer
   twos: string; // deck of two-face cards
-  twop: number; // picked two-face card
+  discard: number; // int -> selected pick card
 }

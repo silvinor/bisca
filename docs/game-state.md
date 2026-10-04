@@ -143,9 +143,9 @@ stateDiagram-v2
     }
     state frk_2 <<fork>>
     state jne_2 <<join>>
-    state "SELECT_DEALER_START_PICK_2" as MODE4 {
+    state "SELECT_DEALER_ASK_TO_PICK_2" as MODE4 {
         state if_3 <<choice>>
-        state "SELECT_DEALER_USER_PICK_2" as USER_PICK2 : Wait for user pick
+        state "SELECT_DEALER_USER_PICKED_2" as USER_PICK2 : Wait for user pick
         state "SELECT_DEALER_COMPUTER_PICK_2" as COMPUTER_PICK2 : Computer picks
         state "SELECT_DEALER_DISCARD_2" as DISCARD2 : Remove 2-face card
     }

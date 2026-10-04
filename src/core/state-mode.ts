@@ -115,10 +115,6 @@ export class GameModeGameState extends GameState<StateMain, GameModeSelection | 
   protected tock(): StateMain {
     const selection = this.lastTrigger;
 
-    // logger.info('****************');
-    // logger.info(selection);
-    // logger.info('****************');
-
     if (!this.triggered || !selection) return this.currentState;
 
     // Copy the validated dialog selection into the game context before changing screens.
@@ -138,7 +134,6 @@ export class GameModeGameState extends GameState<StateMain, GameModeSelection | 
   }
   
   protected end(): void {
-    // logger.debug('GAME_MODE --> End');
     const appMain = document.getElementById('app-main');
     if (appMain) render(null, appMain);
     this.loaded = false;

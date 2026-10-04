@@ -75,7 +75,7 @@
   "state-dealer:player-1-deals": "O jogador 1 dá primeiro.",
   "state-dealer:player-2-deals": "O jogador 2 dá primeiro.",
   "state-dealer:player-3-deals": "O jogador 3 dá primeiro.",
-  "state-dealer:pick-two": "Escolha um dois para remover.",
-  "state-dealer:discard-card": "Remover carta",
+  "state-dealer:pick-two": "Escolha uma carta para remover.",
+  "state-dealer:discard-card": "Esta carta será retirada do baralho.",
   "reactions:confirm-quit": "Tem a certeza de que pretende sair do jogo atual?"
 }
