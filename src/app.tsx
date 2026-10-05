@@ -33,7 +33,7 @@ const navButtonsByState: Record<ActiveGameState, string> = {
   [StateMain.SPLASH]: 'c',
   [StateMain.GAME_MODE]: 'sh',
   [StateMain.SELECT_DEALER]: 'shq',
-  [StateMain.PLAY]: 'shq',
+  [StateMain.PLAY]: 'q',
   [StateMain.WIN_LOSE]: '',
   [StateMain.SETTINGS]: '',
   [StateMain.HELP]: '',
@@ -107,9 +107,11 @@ export function App() {
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <div class="navbar-nav me-auto" />
-              <form class="d-flex">
-                {renderNavButtons(navState)}
-              </form>
+              <fieldset class="d-flex">
+                <form class="navbar-buttons">
+                  {renderNavButtons(navState)}
+                </form>
+              </fieldset>
             </div>
           </div>
         </nav>

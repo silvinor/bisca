@@ -7,7 +7,7 @@ import { InitGameState } from './state-init';
 import { SplashGameState } from './state-splash';
 import { GameModeGameState } from './state-mode';
 import { SelectDealerGameState } from './state-dealer';
-// import { PlayGameState } from './state-play';
+import { PlayGameState } from './state-play';
 // import { WinLoseGameState } from './state-win-lose';
 import { SettingsScreen } from './state-settings';
 import { HelpScreen } from './state-help';
@@ -211,8 +211,7 @@ export const gameEngine = new MainGameEngine(
     // [StateMain.GAME_MODE]: null,
     [StateMain.SELECT_DEALER]: () => new SelectDealerGameState(),
     // [StateMain.SELECT_DEALER]: null,
-    // [StateMain.PLAY]: () => new PlayGameState(),
-    [StateMain.PLAY]: null,
+    [StateMain.PLAY]: () => new PlayGameState(),
     // [StateMain.WIN_LOSE]: () => new WinLoseGameState(),
     [StateMain.WIN_LOSE]: null,
 

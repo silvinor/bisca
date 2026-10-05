@@ -1,10 +1,9 @@
 // Copyright (c) 2026 @SilvinoR
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
+import type { G } from '../types/game-context.d';
 import { 
-  type GameMode,
   GAME_MODE_1,
-  type Difficulty,
   GAME_DIFFICULTY_NORMAL,
 } from '../types/game-state.d';
 import { 
@@ -41,42 +40,6 @@ import { logger } from './logger';
 //   setsWon: Record<PlayerID, number>;
 // }
 
-/** boardgame.io-shaped game state. Kept as a module singleton until the real boardgame.io Client wiring lands. */
-export interface G {
-  mode: GameMode;
-  difficulty: Difficulty;
-  matchCnt: 1 | 2 | 3 | 4;
-  deck: string;
-  dealer: number;
-  discard: string; // cards removed from deck - mode 4, picked 2
-
-  // matchSetCount: 1 | 2 | 3;
-  // setIndex: number;
-  // setResults: SetResult[];
-  // matchResult: MatchResult | null;
-
-  // dealer: PlayerID;
-  // leader: PlayerID;
-  // trumpIndicator: string;
-  // stock: string;
-
-  // hands: Record<PlayerID, string>;
-  // captured: Record<PlayerID, string>;
-
-  // trick: TrickCard[];
-  // lastTrick: ResolvedTrick | null;
-  // trickNumber: number;
-}
-
-/** boardgame.io-shaped turn/phase context. Kept as a module singleton until the real boardgame.io Client wiring lands. */
-export interface Ctx {
-  // numPlayers: number;
-  // currentPlayer: PlayerID;
-  // playOrder: PlayerID[];
-  // playOrderPos: number;
-  // turn: number;
-}
-
 function initialG(): G {
   return {
     mode: GAME_MODE_1,
@@ -112,17 +75,6 @@ function initialG(): G {
   };
 }
 
-function initialCtx(): Ctx {
-  return {
-    // numPlayers: 2,
-    // currentPlayer: '0',
-    // playOrder: ['0', '1'],
-    // playOrderPos: 0,
-    // turn: 0,
-    // phase: 'selectDealer',
-  };
-}
-
 export function loadG(): G {
   try {
     return JSON.parse(
@@ -140,6 +92,3 @@ export function saveG(g: G): void {
 
 /** Singleton game state, available from app startup. */
 export const g: G = initialG();
-
-/** Singleton turn/phase context, available from app startup. */
-export const ctx: Ctx = initialCtx();

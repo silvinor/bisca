@@ -28,7 +28,7 @@
 
 // ---------- DEBUG -----------
 
-.debug {
+body.debug {
   .debug-badge {
     opacity: 0.75;
     font-size: 150%;
@@ -42,7 +42,14 @@
   .speech-bubble {
     pointer-events: auto !important;
   }
+
+  &.play {
+    .navbar-buttons {
+      margin-right: 50px !important;  // offset for the gameboard.io debug button
+    }
+  }
 }
+
 
 // ---------- App Specific and UI fit classes ----------
 

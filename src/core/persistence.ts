@@ -4,7 +4,7 @@
 const PERSISTENCE_PREFIX = 'bisca';
 
 export class Persistence {
-  public get(group: string, name: string, defaultValue?: string): string | null {
+  public get(group: string, name: string, defaultValue?: string): any {
     const value = localStorage.getItem(`${PERSISTENCE_PREFIX}.${group}.${name}`);
     return value === null ? defaultValue ?? null : value;
   }
