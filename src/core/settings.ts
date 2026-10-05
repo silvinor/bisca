@@ -1,7 +1,7 @@
 // Copyright (c) 2026 @SilvinoR
-// SPDX-License-Identifier:
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /**
- * App specific settings
+ * App specific settings and runtime resources.
  */
 
 interface ResourceSettings {
@@ -15,34 +15,39 @@ interface FaviconSettings {
   png?: string;
 }
 
-interface AppSettings {
-  bootstrap?: ResourceSettings;
-  fontawesome?: ResourceSettings;
-  animejs?: ResourceSettings;
+const libraries = [
+  "bootstrap",
+  "fontawesome",
+  "fonts",
+  // "animejs",
+  "boardgameio"
+] as const;
+
+type LibraryName = typeof libraries[number];
+type AppSettings = Partial<Record<LibraryName, ResourceSettings>> & {
   favicon?: FaviconSettings;
-}
+};
 
 class Settings {
   private settings: AppSettings | null = null;
-  private isLoaded: boolean = false;
-  private isBootstrapReady: boolean = false;
-  private isAnimeReady: boolean = false;
+  private isLoaded = false;
+  private libraryReady: Partial<Record<LibraryName, boolean>> = {};
   private loadPromise: Promise<void> | null = null;
 
-  async init(): Promise<void> {
-    if (this.loadPromise) {
-      return this.loadPromise;
-    }
-
-    this.loadPromise = this.load();
+  init(): Promise<void> {
+    this.loadPromise ??= this.load();
     return this.loadPromise;
   }
 
   private async load(): Promise<void> {
-    const response = await fetch("/registry/settings.json");
-    this.settings = await response.json();
-    this.isLoaded = true;
+    const response = await fetch("/assets/settings.json");
+    if (!response.ok) {
+      throw new Error(`[Settings] Failed to load settings: ${response.status}`);
+    }
+
+    this.settings = await response.json() as AppSettings;
     await this.injectResources();
+    this.isLoaded = true;
   }
 
   private toArray(value?: string | string[]): string[] {
@@ -50,88 +55,47 @@ class Settings {
     return Array.isArray(value) ? value : [value];
   }
 
-  /** Injects configured assets and resolves after ordered Bootstrap dependencies settle. */
   private async injectResources(): Promise<void> {
     if (!this.settings) return;
 
-    // Clean up temporary DOM items
+    this.injectFavicons(this.settings.favicon);
+
+    // Library CSS must come before the app CSS, so the app CSS wins the cascade. Find the first app stylesheet
+    // before any library link exists: a <style data-vite-dev-id> in dev, or the bundled <link> in a build.
+    // If there is none, the anchor is null and the library links are appended to <head>.
+    const appCssAnchor = document.head.querySelector('style[data-vite-dev-id], link[rel="stylesheet"]');
+
+    // Libraries are independent, but each library's JavaScript URLs run in order.
+    await Promise.all(libraries.map(async (name) => {
+      const resource = this.settings?.[name];
+      const cssUrls = this.toArray(resource?.css);
+      const jsUrls = this.toArray(resource?.js);
+      const cssLoaded = await Promise.all(cssUrls.map((href) => this.injectCSS(href, appCssAnchor)));
+
+      let jsLoaded = true;
+      for (const src of jsUrls) {
+        const loaded = await this.injectJS(src);
+        jsLoaded = loaded && jsLoaded;
+      }
+
+      this.libraryReady[name] = cssUrls.length + jsUrls.length > 0
+        && cssLoaded.every(Boolean)
+        && jsLoaded;
+    }));
+
     for (let n = 1; document.getElementById(`delete-${n}`); n++) {
       document.getElementById(`delete-${n}`)!.remove();
     }
-
-    // Inject Bootstrap CSS
-    this.toArray(this.settings.bootstrap?.css).forEach((src, i) =>
-      this.injectCSS(src, `bootstrap-${i + 1}`),
-    );
-
-    // Load Bootstrap dependencies in configured order so Popper executes before Bootstrap.
-    const bootstrapJsUrls = this.toArray(this.settings.bootstrap?.js);
-    let bootstrapDependenciesLoaded = bootstrapJsUrls.length > 0;
-    for (const src of bootstrapJsUrls) {
-      const loaded = await new Promise<boolean>((resolve) => {
-        this.injectJS(
-          src,
-          () => resolve(true),
-          () => {
-            console.error(
-              `[Settings] Failed to load Bootstrap dependency: ${src}`,
-            );
-            resolve(false);
-          },
-        );
-      });
-      bootstrapDependenciesLoaded &&= loaded;
-    }
-    const bootstrap = (window as Window & {
-      bootstrap?: { Dropdown?: unknown };
-    }).bootstrap;
-    this.isBootstrapReady =
-      bootstrapDependenciesLoaded && Boolean(bootstrap?.Dropdown);
-
-    // Load Anime.js before Preact renders so its UMD API is available through window.anime.
-    const animeJsUrls = this.toArray(this.settings.animejs?.js);
-    let animeDependenciesLoaded = animeJsUrls.length > 0;
-    for (const src of animeJsUrls) {
-      const loaded = await new Promise<boolean>((resolve) => {
-        this.injectJS(
-          src,
-          () => resolve(true),
-          () => {
-            console.error(`[Settings] Failed to load Anime.js dependency: ${src}`);
-            resolve(false);
-          },
-        );
-      });
-      animeDependenciesLoaded &&= loaded;
-    }
-    const anime = (window as Window & {
-      anime?: { createScope?: unknown; createTimeline?: unknown };
-    }).anime;
-    this.isAnimeReady = animeDependenciesLoaded
-      && typeof anime?.createScope === 'function'
-      && typeof anime?.createTimeline === 'function';
-
-    // Inject Fontawesome
-    this.toArray(this.settings.fontawesome?.css).forEach((src, i) =>
-      this.injectCSS(src, `fontawesome-${i + 1}`),
-    );
-    this.toArray(this.settings.fontawesome?.js).forEach((src) =>
-      this.injectJS(src),
-    );
-
-    // Inject Favicons
-    this.injectFavicons();
   }
 
-  private injectFavicons() {
-    const favicon = this.settings?.favicon;
+  private injectFavicons(favicon?: FaviconSettings): void {
     if (!favicon) return;
 
     if (favicon.ico) {
       const link = document.createElement("link");
       link.rel = "icon";
       link.href = favicon.ico;
-      link.setAttribute("sizes", "any");
+      link.type = "image/x-icon";
       document.head.appendChild(link);
     }
 
@@ -148,29 +112,35 @@ class Settings {
       link.rel = "icon";
       link.href = favicon.png;
       link.type = "image/png";
-      link.setAttribute("sizes", "192x192");
       document.head.appendChild(link);
     }
   }
 
-  private injectCSS(href: string, id?: string) {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = href;
-    if (id) link.id = id;
-    document.head.appendChild(link);
+  private injectCSS(href: string, before: Element | null): Promise<boolean> {
+    return new Promise((resolve) => {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = href;
+      link.onload = () => resolve(true);
+      link.onerror = () => {
+        console.error(`[Settings] Failed to load CSS: ${href}`);
+        resolve(false);
+      };
+      document.head.insertBefore(link, before);
+    });
   }
 
-  private injectJS(
-    src: string,
-    onload?: () => void,
-    onerror?: () => void,
-  ) {
-    const script = document.createElement("script");
-    script.src = src;
-    if (onload) script.onload = onload;
-    if (onerror) script.onerror = onerror;
-    document.body.appendChild(script);
+  private injectJS(src: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = () => resolve(true);
+      script.onerror = () => {
+        console.error(`[Settings] Failed to load JavaScript: ${src}`);
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
   }
 
   get<K extends keyof AppSettings>(key: K): AppSettings[K] | undefined {
@@ -181,14 +151,9 @@ class Settings {
     return this.isLoaded;
   }
 
-  /** Reports whether every configured Bootstrap dependency loaded and its dropdown API is available. */
-  get bootstrapReady(): boolean {
-    return this.isBootstrapReady;
-  }
-
-  /** Reports whether every configured Anime.js dependency loaded and its core API is available. */
-  get animeReady(): boolean {
-    return this.isAnimeReady;
+  /** Reports whether every configured resource for a library loaded. */
+  isReady(name: LibraryName): boolean {
+    return this.libraryReady[name] === true;
   }
 }
 

@@ -3,21 +3,30 @@
 
 import { useState } from 'preact/hooks';
 
+export type RadioImagesLayerClasses = readonly [
+  background: string,
+  texture: string,
+  image: string,
+  overlay: string,
+];
+
 export interface RadioImagesOption<T extends string> {
   id: T;
-  label: string;
-  description?: string;
+  label?: string;
   image?: string;
+  classes?: RadioImagesLayerClasses;
+  description?: string;
+  hint?: boolean | string;
+  disabled?: boolean;
 }
 
-interface RadioImagesProps<T extends string> {
+export interface RadioImagesProps<T extends string> {
   name: string;
-  options: RadioImagesOption<T>[];
+  options: readonly RadioImagesOption<T>[];
   value: T;
   onChange: (value: T) => void;
-  ariaLabel?: string;
-  tableColor: string;
-  tableTexture: string;
+  ariaLabel: string;
+  imageSizePercent?: number;
 }
 
 function safeHtmlIdPart(value: string): string {
@@ -28,85 +37,104 @@ function safeHtmlIdPart(value: string): string {
   ).join('');
 }
 
-/**
- * A single-choice radio group, styled as plain bordered tiles rather than
- * Bootstrap's `.btn`/`.btn-check` buttons. Each option gets its own `.w20`
- * wrapper (the flex item) so percentage sizing is resolved against a definite
- * width instead of the image's own intrinsic size.
- */
+const LAYER_STYLE = {
+  position: 'absolute',
+  inset: 0,
+  width: '100%',
+  height: '100%',
+} as const;
+
 export function RadioImages<T extends string>({
   name,
   options,
   value,
   onChange,
   ariaLabel,
-  tableColor,
-  tableTexture,
+  imageSizePercent = 100,
 }: RadioImagesProps<T>) {
   const selectedOption = options.find((option) => option.id === value);
   const [focusedOptionId, setFocusedOptionId] = useState<T | null>(null);
+  const imageSize = `${Math.max(0, Math.min(100, imageSizePercent))}%`;
 
   return (
-    <div>
-      <div className='d-flex flex-wrap' role='group' aria-label={ariaLabel}>
+    <>
+      <div className='radio-images' role='radiogroup' aria-label={ariaLabel}>
         {options.map((option) => {
           const inputId = `radio-${safeHtmlIdPart(name)}-${safeHtmlIdPart(option.id)}`;
           const isSelected = option.id === value;
           const isFocused = option.id === focusedOptionId;
+          const tooltip = option.hint === true
+            ? option.description
+            : typeof option.hint === 'string' ? option.hint : undefined;
 
           return (
-            <div key={option.id} className='w20 p-1'>
+            <span
+              key={option.id}
+              className={`radio-images-item ${isSelected ? 'selected' : 'unselected'}${isFocused ? ' focus' : ''}`}
+            >
               <input
                 type='radio'
-                className='toggle-input visually-hidden'
+                className='btn-check'
                 name={name}
                 id={inputId}
+                value={option.id}
                 autoComplete='off'
                 checked={isSelected}
+                disabled={option.disabled}
                 onChange={() => onChange(option.id)}
                 onFocus={() => setFocusedOptionId(option.id)}
                 onBlur={() => setFocusedOptionId(null)}
               />
               <label
+                className='radio-images-button'
                 htmlFor={inputId}
-                className='toggle-option'
-                data-bs-toggle='tooltip'
-                data-bs-title={option.label}
+                style={{ position: 'relative' }}
+                {...tooltip && {
+                  'data-bs-toggle': 'tooltip',
+                  'data-bs-placement': 'top',
+                  'data-bs-title': tooltip,
+                }}
               >
-                {option.image ? (
-                  <div
-                    className={`radio-image-preview rounded rounded-1 ${isSelected ? 'selected' : 'unselected'} ${isFocused ? 'focused' : 'unfocused'}`}
-                  >
-                    <svg
-                      className='radio-image-preview-color'
-                      width='512'
-                      height='512'
-                      viewBox='0 0 512 512'
-                      aria-hidden='true'
-                    >
-                      <rect width='512' height='512' fill={tableColor} />
-                    </svg>
-                    <span
-                      className='radio-image-preview-texture'
-                      style={{ backgroundImage: `url(${tableTexture})` }}
-                      aria-hidden='true'
-                    />
-                    <img
-                      src={option.image}
-                      alt={option.label}
-                      className='radio-image-preview-art'
-                    />
-                    <span className='radio-image-overlay visually-hidden'>{option.label}</span>
-                  </div>
-                ) : option.label}
+                <svg
+                  className={`radio-images-bg ${option.classes?.[0] ?? ''}`.trim()}
+                  style={LAYER_STYLE}
+                  viewBox='0 0 256 256'
+                  fill='transparent'
+                  stroke='transparent'
+                >
+                  <rect x='0' y='0' width='256' height='265' />
+                </svg>
+                <div
+                  className={`radio-images-tx ${option.classes?.[1] ?? ''}`.trim()}
+                  style={LAYER_STYLE}
+                />
+                {option.image && (
+                  <img
+                    className={`radio-images-img ${option.classes?.[2] ?? ''}`.trim()}
+                    style={{
+                      ...LAYER_STYLE,
+                      inset: '50% auto auto 50%',
+                      width: imageSize,
+                      height: imageSize,
+                      objectFit: 'contain',
+                      transform: 'translate(-50%, -50%)',
+                    }}
+                    src={option.image}
+                    alt={option.label}
+                  />
+                )}
+                <div 
+                  className={`radio-images-ov ${option.classes?.[3] ?? ''}`.trim()} 
+                  style={LAYER_STYLE}
+                />
               </label>
-            </div>
+            </span>
           );
         })}
       </div>
-      <div className='form-text text-info' aria-live='polite'>
+      <div className='form-text' aria-live='polite'>
         {selectedOption?.description ?? selectedOption?.label}
       </div>
-    </div>
+    </>
   );
 }

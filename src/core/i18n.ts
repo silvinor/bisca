@@ -26,6 +26,7 @@ class I18n {
 
   private async loadBrowserLanguage(): Promise<void> {
     const browserLang = navigator.language.toLowerCase();
+    // const browserLang = 'pt'; // FIXME : DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG !!!!
 
     // Try exact match first (e.g., pt-br)
     if (await this.tryLoadLanguage(browserLang)) {

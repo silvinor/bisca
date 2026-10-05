@@ -1,0 +1,84 @@
+// Copyright (c) 2026 @SilvinoR
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+
+import type { CSSProperties } from 'preact';
+import { getBackFaceUrl, getCardFaceUrl } from '../core/deck-handler';
+
+/* ----- Card Face ----- */
+
+interface CardFaceProps {
+  letter: string;
+  style?: CSSProperties;
+  onClick?: () => void;
+}
+
+export function CardFace({ letter, style, onClick }: CardFaceProps) {
+  const src = getCardFaceUrl(letter);
+
+  if (!onClick) {
+    return (
+      <img
+        className='playing-card position-absolute w-auto'
+        style={style}
+        src={src}
+        alt=''
+        draggable={false}
+      />
+    );
+  }
+
+  return (
+    <button
+      type='button'
+      className='playing-card position-absolute border-0 bg-transparent p-0'
+      style={style}
+      onClick={onClick}
+    >
+      <img
+        className='h-100 w-auto'
+        src={src}
+        alt=''
+        draggable={false}
+      />
+    </button>
+  );
+}
+
+/* ----- Card Back ---- */
+
+interface CardBackProps {
+  style?: CSSProperties;
+  onClick?: () => void;
+}
+
+export function CardBack({ style, onClick }: CardBackProps) {
+  const src = getBackFaceUrl();
+
+  if (!onClick) {
+    return (
+      <img
+        className='playing-card position-absolute w-auto'
+        style={style}
+        src={src}
+        alt=''
+        draggable={false}
+      />
+    );
+  }
+
+  return (
+    <button
+      type='button'
+      className='playing-card position-absolute border-0 bg-transparent p-0'
+      style={style}
+      onClick={onClick}
+    >
+      <img 
+        className='h-100 w-auto' 
+        src={src}
+        alt=''
+        draggable={false}
+      />
+    </button>
+  );
+}

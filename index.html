@@ -20,32 +20,25 @@ SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
   </style>
 </head>
 <body>
-  <div id="app"></div>
+  <div id="app" class="bg-color bg-texture"></div>
   <script type="module" src="/src/main.tsx"></script>
   <noscript id="delete-4">This app requires JavaScript</noscript>
   <script>
     (function() {
       const media = window.matchMedia('(prefers-color-scheme: dark)');
       const setTheme = (dark) => {
+        window.isDarkMode = dark;
         document.documentElement.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
+        document.body.classList.toggle('dark', dark);
+        document.body.classList.toggle('light', !dark);
       };
       setTheme(media.matches);
       media.addEventListener('change', (e) => setTheme(e.matches));
-    })();
-  </script>
-  <script>
-    // Bootstrap Bundle embeds Popper; standalone Bootstrap is injected after its configured Popper dependency.
-    (function enableTooltips() {
-      if (!window.bootstrap?.Tooltip) {
-        window.requestAnimationFrame(enableTooltips);
-        return;
-      }
 
-      new window.bootstrap.Tooltip(document.body, {
-        selector: '[data-bs-toggle="tooltip"]',
-        html: true,
-        // Bootstrap caches data attributes on first hover; read Preact's current title on every show.
-        title: (element) => element.getAttribute('data-bs-title'),
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      window.isReducedMotion = reducedMotion.matches;
+      reducedMotion.addEventListener('change', (e) => {
+        window.isReducedMotion = e.matches;
       });
     })();
   </script>

@@ -1,7 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<image 
-  width="512" 
-  height="512"
+<image
+  x="101"
+  y="101"
+  width="310" 
+  height="310"
   href="data:image/png;base64,
     iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAADAFBMVEUAAAA2KRY0KBU5KxY4KhU6LBczJhMzJhMxJREvIxEsIA4zJhE0JhIqHQtENB1KOR5gSideSCVp
     US1rTiSSbziGaDhcQxx1Vyh4WSt/YDJrUSeQbzx5WSZ8XS1iSB5EMRNALhFtUypfRiBYQh6MbDxpTB9wUylyViecdz2DYS91WiyOajKHZTSEZDFzWC9uUiI4JgtkSyFx

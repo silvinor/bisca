@@ -12,9 +12,15 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
 
   return {
+    optimizeDeps: {
+      entries: ['index.html'],
+    },
     server: {
       host: env.DEV_HOST || "localhost",
       port: 8080,
+      watch: {
+        ignored: ['**/__*', '**/__*/**'],
+      },
     },
     plugins: [preact()],
   }
