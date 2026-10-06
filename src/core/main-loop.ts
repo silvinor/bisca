@@ -11,7 +11,7 @@ import { PlayGameState } from './state-play';
 // import { WinLoseGameState } from './state-win-lose';
 import { SettingsScreen } from './state-settings';
 import { HelpScreen } from './state-help';
-import { logger } from './logger';
+// import { logger } from './logger';
 // import { ACTION_HELP, ACTION_SETTINGS } from './constants';
 
 // /** The interface needed from each separately implemented mini state engine. */
@@ -76,7 +76,7 @@ export class MainGameEngine extends GameState<StateMain> {
    * other and unwind correctly) and switch to the requested overlay.
    */
   public openOverlay(overlay: StateMain): void {
-    logger.debug(`openOverlay(${overlay})`);
+    // logger.debug(`openOverlay(${overlay})`);
 
     if (this.currentNode) this.allNodes.push(this.currentNode);
 
@@ -94,8 +94,8 @@ export class MainGameEngine extends GameState<StateMain> {
       }
     }
    */
-    this.activateNode(overlay); // FIXME: delete
-    this.notifyStateListeners(); // FIXME: delete
+    this.activateNode(overlay); // FIXME: ???
+    this.notifyStateListeners(); // FIXME: ???
   }
 
   protected init(): void {
@@ -104,7 +104,7 @@ export class MainGameEngine extends GameState<StateMain> {
   }
 
   protected async tick(): Promise<void> {
-    logger.debug(`MAIN --> Tick:${this.currentNode?.state}`);
+    // logger.debug(`MAIN --> Tick:${this.currentNode?.state}`);
     const node = this.currentNode;
     if (!node) return;
 
@@ -115,14 +115,14 @@ export class MainGameEngine extends GameState<StateMain> {
   }
 
   protected async draw(): Promise<void> {
-    logger.debug(`MAIN --> Draw:${this.currentNode?.state}`);
+    // logger.debug(`MAIN --> Draw:${this.currentNode?.state}`);
     if (this.currentNode) {
       this.trigger(undefined);
     }
   }
   
   protected async tock(): Promise<StateMain> {
-    logger.debug(`MAIN --> Tock:${this.currentNode?.state} & nextState:${this.nextState}`);
+    // logger.debug(`MAIN --> Tock:${this.currentNode?.state} & nextState:${this.nextState}`);
     if (!this.currentState) return this.currentState;
     if (!this.nextState) return this.currentState;
 

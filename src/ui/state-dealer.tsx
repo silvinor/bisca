@@ -19,20 +19,6 @@ import {
 } from '../types/game-state.d';
 import { APP_SPEECH_BUBBLE_DELAY } from '../core/constants';
 
-// const CARD_FILES = 'ABCDEFGHIJKLMabcdefghijklmNOPQRSTUVWXYZnopqrstuvwxyz';
-// const TWOS = 'BbOo';
-
-// export interface DealerSelectionPick {
-//   player: number;
-//   cardIndex: number;
-//   card: string;
-// }
-
-// export type DealerSelectionAction =
-//   | { type: 'pick'; cardIndex: number }
-//   | { type: 'discard'; card: string }
-//   | { type: 'continue' };
-
 interface StateSelectDealerProps {
   step: SELECT_DEALER;
   s: S,
@@ -41,37 +27,38 @@ interface StateSelectDealerProps {
 //   onAction: (action: DealerSelectionAction) => void;
 }
 
-function pickedCardStyle(player: number, mode: GameMode): CSSProperties {
-  const pre = { zIndex: 100 + player };
+// function pickedCardStyle(player: number, mode: GameMode): CSSProperties {
+//   const pre = { zIndex: 100 + player };
 
-  if (player === 0) {
-    return { ...pre, left: '50%', bottom: '3%', transform: 'translateX(-50%)' };
-  }
+//   if (player === 0) {
+//     return { ...pre, left: '50%', bottom: '3%', transform: 'translateX(-50%)' };
+//   }
 
-  switch (mode) {
-    case GAME_MODE_1:
-    case GAME_MODE_2:
-    case GAME_MODE_3:
-      return { ...pre, left: '50%', top: '3%', transform: 'translateX(-50%)' };
+//   switch (mode) {
+//     case GAME_MODE_1:
+//     case GAME_MODE_2:
+//     case GAME_MODE_3:
+//       return { ...pre, left: '50%', top: '3%', transform: 'translateX(-50%)' };
 
-    case GAME_MODE_4:
-      return player === 1
-        ? { ...pre, left: '3%', top: '3%' }
-        : { ...pre, right: '3%', top: '3%' };
+//     case GAME_MODE_4:
+//       return player === 1
+//         ? { ...pre, left: '3%', top: '3%' }
+//         : { ...pre, right: '3%', top: '3%' };
 
-    case GAME_MODE_5:
-      if (player === 1) {
-        return { ...pre, left: '3%', top: '15%' };
-      }
-      if (player === 2) {
-        return { ...pre, left: '50%', top: '3%', transform: 'translateX(-50%)' };
-      }
-      return { ...pre, right: '3%', top: '15%' };
-  }
+//     case GAME_MODE_5:
+//       if (player === 1) {
+//         return { ...pre, left: '3%', top: '15%' };
+//       }
+//       if (player === 2) {
+//         return { ...pre, left: '50%', top: '3%', transform: 'translateX(-50%)' };
+//       }
+//       return { ...pre, right: '3%', top: '15%' };
+//   }
 
-  return { ...pre, left: '50%', top: '3%', transform: 'translateX(-50%)' };
-}
+//   return { ...pre, left: '50%', top: '3%', transform: 'translateX(-50%)' };
+// }
 
+/*
 function pickedCardBadgeStyle(player: number, mode: GameMode): CSSProperties {
   const pre = { zIndex: 200 + player, pointerEvents: 'none' };
 
@@ -108,6 +95,7 @@ function pickedCardBadgeStyle(player: number, mode: GameMode): CSSProperties {
 
   return { ...pre, left: '50%', top: '5%', transform: 'translateX(-50%)' };
 }
+*/
 
 export function StateSelectDealer({
   step,
@@ -138,7 +126,7 @@ export function StateSelectDealer({
         <span
           key={`debug-badge-${player}`}
           className={`position-absolute badge rounded-pill text-bg-${badgeVariant} debug-badge`}
-          style={pickedCardBadgeStyle(player, s.mode)}
+          // style={pickedCardBadgeStyle(player, s.mode)}
           aria-hidden='true'
         >
           {shwVal}
@@ -147,15 +135,15 @@ export function StateSelectDealer({
     });
   }
 
-  const cardStyle = (index: number) => {
-    const progress = index / (s.deck.length - 1);
-    return {
-      left: `${progress * 100}%`,
-      top: '50%',
-      transform: `translate(${50 - progress * 200}%, -50%)`,
-      zIndex: index + 1,
-    };
-  };
+  // const cardStyle = (index: number) => {
+  //   const progress = index / (s.deck.length - 1);
+  //   return {
+  //     left: `${progress * 100}%`,
+  //     top: '50%',
+  //     transform: `translate(${50 - progress * 200}%, -50%)`,
+  //     zIndex: index + 1,
+  //   };
+  // };
 
   switch (step) {
     case SELECT_DEALER.USER_PICKING:
@@ -164,8 +152,13 @@ export function StateSelectDealer({
           return (
             <CardBack
               key={index}
+              id={index}
+              chr=''
+              x={2 + (index - 1) * 7 / 39}
+              y={5.5}
+              z={100}
+              r={0}
               onClick={() => onPick(index + 1)}
-              style={cardStyle(index)}
             />
           );
         });
@@ -194,8 +187,12 @@ export function StateSelectDealer({
           return (
             <Fragment key={index}>
               <CardFace
-                letter={s.deck[cardIndex - 1]}
-                style={pickedCardStyle(player, s.mode)}
+                id={cardIndex}
+                chr={s.deck[cardIndex - 1]}
+                x={2 + (index - 1) * 7 / 39}
+                y={5.5}
+                z={200}
+                r={0}
               />
               {debugBadges?.[player]}
             </Fragment>
@@ -203,7 +200,12 @@ export function StateSelectDealer({
         } else return (
           <CardBack
             key={index}
-            style={cardStyle(index)}
+            id={index}
+            chr=''
+            x={2 + (index - 1) * 7 / 39}
+            y={5.5}
+            z={100}
+            r={0}
           />
         );
       });
@@ -237,14 +239,14 @@ export function StateSelectPick2({
   let bubble: ComponentChildren = null;
   let cards: ComponentChildren = null;
 
-  const cardStyle = (index: number) => {
-    return {
-      left: `${(index + 1) * 20}%`,
-      top: '50%',
-      transform: 'translate(-50%, -50%)',
-      zIndex: index + 1,
-    };
-  };
+  // const cardStyle = (index: number) => {
+  //   return {
+  //     left: `${(index + 1) * 20}%`,
+  //     top: '50%',
+  //     transform: 'translate(-50%, -50%)',
+  //     zIndex: index + 1,
+  //   };
+  // };
 
   if (step === SELECT_DEALER.ASK_TO_PICK_2) {
     bubble = <SpeechBubble>{i18n.t('state-dealer:pick-two')}</SpeechBubble>;
@@ -262,15 +264,24 @@ export function StateSelectPick2({
       return (
         <CardFace
           key={cardIndex}
-          letter={s.twos[cardIndex - 1]}
-          style={cardStyle(index)}
+          id={cardIndex}
+          chr={s.twos[cardIndex - 1]}
+          x={cardIndex * 2 + 0.5}
+          y={5.5}
+          z={200}
+          r={0}
         />
       );
     } else {
       return (
         <CardBack
           key={cardIndex}
-          style={cardStyle(index)}
+          id={cardIndex}
+          chr={s.twos[cardIndex - 1]}
+          x={cardIndex * 2 + 0.5}
+          y={5.5}
+          z={100}
+          r={0}
           onClick={step === SELECT_DEALER.ASK_TO_PICK_2 ? () => onPick(cardIndex) : undefined}
         />
       );
