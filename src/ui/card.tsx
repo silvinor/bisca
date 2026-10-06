@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 import { getBackFaceUrl, getCardFaceUrl } from '../core/deck-handler';
+import {
+  PLAYING_CARD_EDGE_PADDING_RATIO,
+  PLAYING_CARD_SIZE_RATIO,
+} from '../core/constants';
 
 /**
  * Builds a "style" string for the card for a 10x10 grid.
@@ -18,7 +22,7 @@ import { getBackFaceUrl, getCardFaceUrl } from '../core/deck-handler';
  * │A        A|
  * └──────────┘
  * Where:
- *  x & y are the % coordinates for the card given in 1..10 notation - the function then calculates the % offset of the centers from top left, 1=9.09%..10=90.909 ... number can be a fracton. Always rounds to 3 decimal places.
+ *  x and y use 1..10 grid coordinates. The y range keeps each card edge 3% inside the table. Values can be fractions. Percentages are rounded to 3 decimal places.
  *  z is the z-index
  *  r is the card rotation in degrees -360-360
  */
@@ -28,9 +32,11 @@ export function buildCardStyle(
   z: number,
   r: number
 ): string {
-  const percent = (coordinate: number): number =>
-    Math.round(coordinate * 100 / 11 * 1000) / 1000;
-  return `left:${percent(x)}%;top:${percent(y)}%;z-index:${z};transform:translate(-50%,-50%)${r === 0 ? '' : ` rotate(${r}deg)`};`;
+  const percentX = (coordinate: number): number => Math.round(coordinate * 100 / 11 * 1000) / 1000;
+  const yEdge = (PLAYING_CARD_SIZE_RATIO / 2 + PLAYING_CARD_EDGE_PADDING_RATIO) * 100;
+  const percentY = (coordinate: number): number =>
+    Math.round((yEdge + (coordinate - 1) * (100 - yEdge * 2) / 9) * 1000) / 1000;
+  return `left:${percentX(x)}%;top:${percentY(y)}%;z-index:${z};transform:translate(-50%,-50%)${r === 0 ? '' : ` rotate(${r}deg)`};`;
 }
 
 interface CardProps {

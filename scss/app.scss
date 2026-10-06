@@ -43,11 +43,16 @@ body.debug {
     pointer-events: auto !important;
   }
 
-  &.play {
+  &.play { 
     .navbar-buttons {
       margin-right: 50px !important;  // offset for the gameboard.io debug button
     }
   }
+
+  // .play-table {
+  //   border: 5px dotted red;
+  //   background-color: #F002;
+  // }
 }
 
 

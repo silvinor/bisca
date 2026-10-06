@@ -63,6 +63,7 @@ export const I18N_APP_NAME = 'appName';
 // playing surface
 export const PLAYING_SURFACE_ASPECT_RATIO = 3 / 2;
 export const PLAYING_CARD_SIZE_RATIO = 0.2;
+export const PLAYING_CARD_EDGE_PADDING_RATIO = 0.02;
 
 /* Game engine */
 export const DEFAULT_DECK_CARDS = 'BCDEFLKMGAbcdeflkmgaOPQRSYXZTNopqrsyxztn';
