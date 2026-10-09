@@ -256,7 +256,7 @@ export function setCardBack(
 ): void {
   try {
     const currentDeckName = deck ?? getGameDeckName();
-    persistence.set(SAVE_GROUP_OPTION, `${SAVE_CARD_BACK}-${currentDeckName}`, back);
+    persistence.set(SAVE_GROUP_OPTION, `${SAVE_CARD_BACK}.${currentDeckName}`, back);
   } catch (error: unknown) {
     logger.warn('[Persistence] Failed to save card back:', error); // don't i18n
   }

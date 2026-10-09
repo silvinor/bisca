@@ -46,6 +46,8 @@ function initialG(): G {
     difficulty: GAME_DIFFICULTY_NORMAL,
     matchCnt: 1,
     deck: DEFAULT_DECK_CARDS,
+    hand: [],
+    won: [],
     dealer: UNKNOWN_DEALER,
     discard: '',
     // matchSetCount: 1,

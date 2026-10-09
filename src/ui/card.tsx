@@ -47,12 +47,11 @@ interface CardProps {
   z: number;
   r: number;
   onClick?: () => void;
+  disabled?: boolean;
 }
 
-/* ----- Card Face ----- */
-
-export function CardFace({ id, chr, x, y, z, r, onClick }: CardProps) {
-  const src = getCardFaceUrl(chr);
+export function Card({ id, chr, x, y, z, r, onClick, disabled }: CardProps) {
+  const src = chr ? getCardFaceUrl(chr) : getBackFaceUrl();
   const style = buildCardStyle(x, y, id+z, r);
 
   if (!onClick) {
@@ -75,6 +74,7 @@ export function CardFace({ id, chr, x, y, z, r, onClick }: CardProps) {
       className='playing-card position-absolute border-0 bg-transparent p-0'
       style={style}
       onClick={onClick}
+      disabled={disabled}
     >
       <img
         className='h-100 w-auto'
@@ -86,40 +86,14 @@ export function CardFace({ id, chr, x, y, z, r, onClick }: CardProps) {
   );
 }
 
+/* ----- Card Face ----- */
+
+export function CardFace(props: CardProps) {
+  return <Card {...props} />;
+}
+
 /* ----- Card Back ---- */
 
-export function CardBack({ id, chr, x, y, z, r, onClick }: CardProps) {
-  const src = getBackFaceUrl();
-  const style = buildCardStyle(x, y, id+z, r);
-  void chr;
-
-  if (!onClick) {
-    return (
-      <img
-        id={`card-id-${id}`}
-        className='playing-card position-absolute w-auto'
-        style={style}
-        src={src}
-        alt=''
-        draggable={false}
-      />
-    );
-  }
-
-  return (
-    <button
-      type='button'
-      className='playing-card position-absolute border-0 bg-transparent p-0'
-      style={style}
-      onClick={onClick}
-    >
-      <img 
-        id={`card-id-${id}`}
-        className='h-100 w-auto' 
-        src={src}
-        alt=''
-        draggable={false}
-      />
-    </button>
-  );
+export function CardBack(props: CardProps) {
+  return <Card {...props} chr='' />;
 }

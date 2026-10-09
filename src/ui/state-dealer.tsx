@@ -1,9 +1,9 @@
 // Copyright (c) 2026 @SilvinoR
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-import { Fragment, type ComponentChildren } from 'preact';
+import type { ComponentChildren } from 'preact';
 import { i18n } from '../core/i18n';
-import { buildCardStyle, CardBack, CardFace } from './card';
+import { buildCardStyle, Card, CardBack, CardFace } from './card';
 import { SpeechBubble } from './speech-bubble';
 import { Table } from './table';
 import { type S, SELECT_DEALER } from '../types/state-dealer.d';
@@ -87,16 +87,17 @@ export function StateSelectDealer({
     case SELECT_DEALER.USER_PICKING:
       bubble = <SpeechBubble>{i18n.t('state-dealer:pick-card')}</SpeechBubble>
       cards = Array.from({ length: s.deck.length }, (_, index) => {
+          const cardIndex = index + 1;
           return (
-            <CardBack
-              key={index}
-              id={index}
+            <Card
+              key={cardIndex}
+              id={cardIndex}
               chr=''
-              x={2 + (index - 1) * 7 / 39}
+              x={2 + (cardIndex - 1) * 7 / 39}
               y={5.5}
               z={100}
               r={-10.5+(index/2)}
-              onClick={() => onPick(index + 1)}
+              onClick={() => onPick(cardIndex)}
             />
           );
         });
@@ -124,27 +125,29 @@ export function StateSelectDealer({
         if (player !== -1) {
           const [x, y] = pickedCardPosition(player, s.mode);
           return (
-            <Fragment key={index}>
-              <CardFace
-                id={cardIndex}
-                chr={s.deck[cardIndex - 1]}
-                x={x}
-                y={y}
-                z={200}
-                r={0}
-              />
-              {debugBadges?.[player]}
-            </Fragment>
+            <Card
+              key={cardIndex}
+              id={cardIndex}
+              chr={s.deck[cardIndex - 1]}
+              x={x}
+              y={y}
+              z={200}
+              r={0}
+              onClick={() => onPick(cardIndex)}
+              disabled
+            />
           );
         } else return (
-          <CardBack
-            key={index}
-            id={index}
+          <Card
+            key={cardIndex}
+            id={cardIndex}
             chr=''
-            x={2 + (index - 1) * 7 / 39}
+            x={2 + (cardIndex - 1) * 7 / 39}
             y={5.5}
             z={100}
             r={-10.5+(index/2)}
+            onClick={() => onPick(cardIndex)}
+            disabled
           />
         );
       });
@@ -157,6 +160,7 @@ export function StateSelectDealer({
       {bubble}
       <Table>
         {cards}
+        {debugBadges}
       </Table>
     </>
   );

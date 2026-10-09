@@ -20,7 +20,7 @@
     "markdown-it-anchor": "^10.0.0",
     "markdown-it-attrs": "^5.0.1",
     "markdown-it-footnote": "^4.0.0",
-    "preact": "^11.0.0"
+    "preact": "^11.0.1"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.6",
@@ -31,7 +31,7 @@
     "sass": "1.78.0",
     "sharp": "^0.35.5",
     "typescript": "~7.0.2",
-    "vite": "^8.3.2"
+    "vite": "^8.3.4"
   },
   "allowScripts": {
     "fsevents@2.3.3": true,

@@ -1,7 +1,11 @@
 // Copyright (c) 2026 @SilvinoR
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
+import { Table } from './table';
 
+export function StatePlay() {
+  return <Table />;
+}
 
 // import { useEffect, useState } from 'preact/hooks';
 // import {

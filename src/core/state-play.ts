@@ -4,6 +4,8 @@
 import { GameState } from './game-state';
 import { playerCount } from './game-common';
 import { g } from './game-context';
+import { StatePlay } from '../ui/state-play';
+import { h, render } from 'preact';
 import {
   type Trigger,
   StateMain,
@@ -18,12 +20,21 @@ import {
 const Bisca: Game<G> = {
   name: 'bisca',
   setup: () => structuredClone(g),
+  turn: {
+    order: {
+      first: ({ G }) => G.dealer,
+      next: ({ ctx }) => (ctx.playOrderPos + 1) % ctx.playOrder.length,
+    },
+  },  
 };
 
-function createBiscaClient() {
+function createBiscaClient(g: G) {
   const Client = window.BoardgameIO?.Client;
   if (!Client) throw new Error('[Play] boardgame.io failed to load.');
   const numPlayers = playerCount(g.mode);
+  g.hand = Array(numPlayers).fill('');
+  g.won = Array(numPlayers).fill('');
+
   if (!window.isDebug) return Client<G>({ game: Bisca, numPlayers, debug: false });
   const debugTarget = document.getElementById('app-main');
   if (!debugTarget) throw new Error('[Play] #app-main was not found.');
@@ -36,7 +47,6 @@ export interface PlaySelectionAction extends Trigger {
   nextState: StateMain | null;
 }
 
-
 export class PlayGameState extends GameState<
   StateMain,
   PlaySelectionAction | Trigger
@@ -48,7 +58,8 @@ export class PlayGameState extends GameState<
   }
 
   protected init(): void {
-    this.game ??= createBiscaClient();
+    
+    this.game ??= createBiscaClient(g);
     this.game!.start();
   }
 
@@ -57,7 +68,8 @@ export class PlayGameState extends GameState<
   }
 
   protected draw(): void { 
-    /* ... do nothing */
+    const appMain = document.getElementById('app-main');
+    if (appMain) render(h(StatePlay, {}), appMain);
   }
 
   protected tock(): StateMain {
@@ -80,5 +92,7 @@ export class PlayGameState extends GameState<
     // Copy the authoritative game state into the existing app singleton.
     Object.assign(g, structuredClone(this.game!.getState()!.G));
     this.game?.stop();
+    const appMain = document.getElementById('app-main');
+    if (appMain) render(null, appMain);
   }
 }
