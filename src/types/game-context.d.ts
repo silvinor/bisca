@@ -2,6 +2,13 @@
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 import type { GameMode, Difficulty } from "./game-state";
+import type { AnimationState } from './anim-state';
+
+export interface DeckDisplayPosition {
+  x: number;
+  y: number;
+  rotation: number;
+}
 
 /** boardgame.io-shaped game state. Kept as a module singleton until the real boardgame.io Client wiring lands. */
 export interface G {
@@ -9,6 +16,8 @@ export interface G {
   difficulty: Difficulty; // game difficulty (bot selector) in play
   matchCnt: 1 | 2 | 3 | 4; // how many games to play, not a count or a set
   deck: string; // the card deck in cutting, and on the table as unplayed
+  deckDisplayPositions: DeckDisplayPosition[];
+  animationState: AnimationState;
   hand: string[]; // each players hands (cannot be seen by bots)
   won: string[]; // each players won cards (can be "remembered" by bots)
   dealer: number; // player who is dealer

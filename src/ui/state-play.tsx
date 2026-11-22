@@ -1,10 +1,18 @@
 // Copyright (c) 2026 @SilvinoR
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
+import { CardBack } from './card';
 import { Table } from './table';
+import type { DeckDisplayPosition } from '../types/game-context.d';
 
-export function StatePlay() {
-  return <Table />;
+export function StatePlay({ deckDisplayPositions }: { deckDisplayPositions: DeckDisplayPosition[] }) {
+  return (
+    <Table>
+      {deckDisplayPositions.map(({ x, y, rotation }, id) => (
+        <CardBack key={id} id={id} chr='' x={x} y={y} z={id} r={rotation} />
+      ))}
+    </Table>
+  );
 }
 
 // import { useEffect, useState } from 'preact/hooks';

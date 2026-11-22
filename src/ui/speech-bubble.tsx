@@ -21,7 +21,7 @@ interface SpeechBubbleProps {
   children: ComponentChildren;
   avatarAlt?: string;
   avatarSrc?: string;
-  /** Milliseconds before `onTimeout` fires. Space, Enter, or Escape ends the delay early. */
+  /** Milliseconds before `onTimeout` fires. Space, Enter, Escape, or a tap outside the navbar ends the delay early. */
   timeout?: number;
   onTimeout?: () => void;
   /** Supplying `onOk` and/or `onCancel` turns the bubble into a confirm prompt with those buttons. */
@@ -62,12 +62,19 @@ export function SpeechBubble({
       event.preventDefault();
       finish();
     };
+    // A tap anywhere also ends the delay, except in the navbar, so its buttons keep their own meaning.
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.target instanceof Element && event.target.closest('.navbar')) return;
+      finish();
+    };
 
     const timer = window.setTimeout(finish, timeout);
     document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('pointerdown', onPointerDown);
     return () => {
       window.clearTimeout(timer);
       document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('pointerdown', onPointerDown);
     };
   }, [timeout]);
 

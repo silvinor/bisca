@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 import type { G } from '../types/game-context.d';
+import { DEFAULT_ANIMATION_STATE } from '../types/anim-state.d';
 import { 
   GAME_MODE_1,
   GAME_DIFFICULTY_NORMAL,
@@ -46,6 +47,8 @@ function initialG(): G {
     difficulty: GAME_DIFFICULTY_NORMAL,
     matchCnt: 1,
     deck: DEFAULT_DECK_CARDS,
+    deckDisplayPositions: [],
+    animationState: DEFAULT_ANIMATION_STATE,
     hand: [],
     won: [],
     dealer: UNKNOWN_DEALER,
